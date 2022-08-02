@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<p>Drives</p>
+<table border="1">
+  <thead>
+  <tr>
+    <th> DRIVE</th>
+    <th> TOTAL SIZE</th>
+    <th> USED</th>
+    <th> % FULL</th>
+    <th> GRAPH</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>
+      <table style="border-collapse:collapse;border:none;" cellpadding="0" cellspacing="0" width="250">
+        <tbody>
+        <tr>
+          <td bgcolor="#CA9321"><div style="width:' + CAST([percent] AS VARCHAR) + '%;border:none;background-color:#CA9321;float:left;height:100%;"></div></td>
+          <td bgcolor="#1D1D1D"><div style="width:' + CAST([percent_diff] AS VARCHAR) + '%;border:none;background-color:#1D1D1D;float:left;height:100%;"></div></td>
+        </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+</table>
+</body>
+</html>

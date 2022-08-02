@@ -1,0 +1,120 @@
+// Schriftfamilien
+.oswald { font-family: Oswald, Arial, sans-serif; }
+.kristi { font-family: Kristi, Arial, sans-serif; }
+.sign1 { font-family: Licorice, Arial, sans-serif; }
+.sign2 { font-family: "Mr De Haviland", Arial, sans-serif; }
+
+// Textfarben & Bootstrapfarben überschreiben
+.text {
+  color: $black;
+  &-primary { color: $primary !important; }
+  &-secondary, &-warning { color: $secondary !important; }
+  &-success { color: $success !important; }
+  &-danger { color: $danger !important; }
+  &-info { color: $info !important; }
+  &-light { color: $gray !important; }
+  &-dark { color: $dark-gray !important; }
+  &-gray { color: $gray-75 !important; }
+  &-muted { color: $gray-50 !important; }
+  &-white { color: $white !important; }
+}
+
+// Schriftgrößen
+@for $i from 6 through 60 {
+  .font-size-#{$i} {
+    font-size: #{$i}px;
+  }
+}
+
+// Textstärke
+@for $i from 1 through 9 {
+  .font-weight-#{$i}00 {
+    font-weight: #{$i}00;
+  }
+}
+
+// Line Height
+.line-height-12 { line-height: 1.2rem; }
+.line-height-20 { line-height: 2rem; }
+.line-height-24 { line-height: 2.4rem; }
+.line-height-28 { line-height: 2.8rem; }
+.line-height-32 { line-height: 3.2rem; }
+.line-height-40 { line-height: 4rem; }
+.line-height-60 { line-height: 6rem; }
+
+// Überschriften
+h1, h2, h3 {
+  font-family: Oswald, Arial, sans-serif;
+}
+h1.hero {
+  font-weight: 500;
+  color: #4d4d4d;
+  font-size: 3.6rem;
+  line-height: 4rem;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  margin-top: -20px;
+}
+h1.hero2 {
+  font-weight: 500;
+  color: #4d4d4d;
+  font-size: 6rem;
+  line-height: 5.4rem;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+h2 {
+  font-weight: 500;
+  color: #4d4d4d;
+  font-size: 2.4rem;
+  line-height: 2.6rem;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+h3 {
+  font-weight: 500;
+  color: $black;
+  font-size: 1.6rem;
+  line-height: 1.6rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+// Sonstige Schriftformatierungen
+.italic { font-style: italic; }
+.pointer { cursor: pointer; }
+a.hiddenLink {
+  text-decoration: none;
+  color: $black;
+}
+
+
+// X-Small devices (portrait phones, less than 576px)
+@media (max-width: 575.98px) {
+
+}
+
+// Small devices (landscape phones, less than 768px)
+@media (max-width: 767.98px) {
+
+}
+
+// Medium devices (tablets, less than 992px)
+@media (max-width: 991.98px) {
+  h1.hero {
+    font-weight: 500;
+    color: #4d4d4d;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+  }
+}
+
+// Large devices (desktops, less than 1200px)
+@media (max-width: 1199.98px) {
+
+}
+
+// X-Large devices (large desktops, less than 1400px)
+@media (max-width: 1399.98px) {
+
+}

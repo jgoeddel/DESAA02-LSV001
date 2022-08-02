@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="4b0c7072-41dd-46ae-bde5-8d28ca984688" name="DESAA02-LSV001" url="http://desaa02-lsv001">
+        <fileTransfer rootFolder="/html" accessType="SFTP" host="DESAA02-LSV001" port="22" sshConfigId="d6c8cea4-e7d5-4507-babf-9a0ff80699d1" sshConfig="ApacheUpload@DESAA02-LSV001:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

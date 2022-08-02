@@ -1,0 +1,23 @@
+// Unsichtbares Selectfeld
+.invisible-formfield {
+  border: none;
+  background: none;
+  width: 98%;
+}
+
+// Switch
+.form-check-input:checked {
+  background-color: $primary;
+  border-color: $primary;
+}
+
+// Input Feld RFID
+.rfidform {
+  width: 100%;
+  text-align: center;
+  font-size: 3rem;
+  border: 2px dotted rgba(133, 149, 157, 0.25);
+  border-radius: 15;
+  height: 3rem;
+  padding: 4rem;
+}

@@ -1,0 +1,124 @@
+// Linien
+.bg-light-lines {
+  background-image: repeating-linear-gradient(45deg, $white 0px, $white 10px, $blue-gray-6 10px, $blue-gray-6 20px, $white 20px);
+}
+.bg-light-lines-orange {
+  background-image: repeating-linear-gradient(45deg, $white 0px, $white 10px, $warning-12 10px, $warning-12 20px, $white 20px);
+}
+.bg-light-lines-primary {
+  background-image: repeating-linear-gradient(45deg, $primary 0px, $primary 10px, $primary-95 10px, $primary-95 20px, $primary 20px);
+}
+.bg-light-lines-info {
+  background-image: repeating-linear-gradient(45deg, $info-12 0px, $info-12 10px, $info-25 10px, $info-25 20px, $info-12 20px);
+}
+.bg-light-lines-success {
+  background-image: repeating-linear-gradient(45deg, $success 0px, $success 10px, $success-95 10px, $success-95 20px, $success 20px);
+}
+.bg-light-lines-danger {
+  background-image: repeating-linear-gradient(45deg, $danger 0px, $danger 10px, $danger-85 10px, $danger-85 20px, $danger 20px);
+}
+.bg-light-lines-danger-2 {
+  background-image: repeating-linear-gradient(45deg, $danger-12 0px, $danger-12 10px, $danger-25 10px, $danger-25 20px, $danger-12 20px);
+}
+.bg-light-lines-warning {
+  background-image: repeating-linear-gradient(45deg, $warning 0px, $warning 10px, $warning-85 10px, $warning-85 20px, $warning 20px);
+}
+.bg-light-lines-warning-2 {
+  background-image: repeating-linear-gradient(45deg, $warning-12 0px, $warning-12 10px, $warning-25 10px, $warning-25 20px, $warning-12 20px);
+}
+.bg-light-lines-success-2 {
+  background-image: repeating-linear-gradient(45deg, $success-6 0px, $success-6 10px, $success-12 10px, $success-12 20px, $success-6 20px);
+}
+.bg-mitarbeiter {
+  background-image: url('../../template/files/images/index_02.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: top;
+}
+
+// Linear Gradient
+.linear__top--gray {
+  background-image: linear-gradient(180deg, $blue-gray-12 0%, $white 25%);
+}
+
+// Parallax
+.parallax-window {
+  background: transparent;
+  display: flex;
+  align-items: flex-end;
+}
+.secondary-box {
+  background-color: rgba($secondary, .85);
+  color: $primary;
+  padding: 2.5rem;
+  margin: 1rem 0;
+  width: -moz-fit-content;
+  width: fit-content;
+  border-radius: .6rem;
+  & h1 {
+    font-weight: 200;
+  }
+  & p {
+    margin-top: -1rem;
+    font-weight: 200;
+  }
+}
+
+// Generelle Hintergründe
+.bg,
+td.bg {
+  &__primary { background-color: $primary;
+    &--95 { background-color: $primary-95; }
+    &--75 { background-color: $primary-75; }
+    &--50 { background-color: $primary-50; }
+    &--25 { background-color: $primary-25; }
+    &--12 { background-color: $primary-12; }
+    &--6 { background-color: $primary-6; }
+  }
+  &__rhenus {
+    background-color: rgba($rhenus-blau, 1);
+    &--70 { background-color: rgba($rhenus-blau, .7); }
+  }
+  &__info {
+    background-color: $info;
+  }
+  &__blue-gray { background-color: $blue-gray;
+    &--75 { background-color: $blue-gray-75; }
+    &--50 { background-color: $blue-gray-50; }
+    &--25 { background-color: $blue-gray-25; }
+    &--12 { background-color: $blue-gray-12; }
+    &--6 { background-color: $blue-gray-6; }
+  }
+  &__white { background-color: $white;
+    &--99 { background-color: $white-99; }
+    &--95 { background-color: $white-95; }
+    &--85 { background-color: $white-85; }
+    &--75 { background-color: $white-75; }
+    &--70 { background-color: $white-70; }
+    &--50 { background-color: $white-50; }
+    &--25 { background-color: $white-25; }
+    &--12 { background-color: $white-12; }
+    &--6 { background-color: $white-6; }
+  }
+  &__success{
+    &--12 {
+      background-color: rgba(40,167,69,.125) !important;
+    }
+    &--6 {
+      background-color: rgba(40,167,69,.05) !important;
+    }
+  }
+  &__danger {
+    background-color: $danger;
+  }
+  &__warning {
+    background-color: $secondary;
+  }
+  &__black {
+    background-color: $black;
+  }
+  &__success {
+    background-color: $success;
+  }
+}

@@ -1,0 +1,22 @@
+#RewriteEngine on
+
+#RewriteBase /
+#RewriteRule ^index\.php$ - [L]
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+
+#RewriteRule ^(.*)/? /index.php/$1 [L,QSA,NC]
+
+RewriteEngine       on
+# Allow the API to function as a Front Controller
+
+RewriteCond %{HTTP_HOST} desaa02-lsv001 [NC]
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^index\.php$ /$1 [L,R=301]
+RewriteCond         %{REQUEST_FILENAME} !-f
+RewriteCond         %{REQUEST_FILENAME} !-d
+RewriteRule         ^(.*)/? /index.php/$1 [L,QSA,NC]
+
+Options +Multiviews
+
+# Znamify

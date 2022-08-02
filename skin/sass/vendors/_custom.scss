@@ -1,0 +1,398 @@
+// Unsorted
+.dspnone { display: none; }
+.divhover {
+  &:hover {
+    background-color: $blue-gray-6;
+  }
+}
+#pline {
+  height: 2px;
+  margin-top: -14px;
+}
+.row { --bs-gutter-x: 0; }
+
+// Header
+header {
+  height: 50px;
+  margin-bottom: -50px;
+}
+// Tabellen
+.thead-dark {
+  background-color: $primary;
+  color: $white;
+}
+table.anwesenheit tr.disabled {
+  opacity: 0.4;
+  border-left: 4px solid #fabb00;
+}
+// Parallax Image Fehlerseite
+.parallax-window-index, .login-index {
+  background: transparent;
+  display: flex;
+  min-height: 100vH;
+  align-items: flex-start;
+}
+.login-index, .index, .admin, .apqp, .netzwerk, .mitarbeiter, .kalender {
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.rotationsplan, .ford {
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.kaenderung {
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.rotationsplan {
+  background-image: url("../files/images/bg_ropa2.webp");
+}
+.login-index {
+  background-image: url("../files/images/bg001.jpg");
+}
+.index {
+  background-image: url("../files/images/bg_admin.webp");
+}
+.admin {
+  background-image: url("../files/images/bg_admin.webp");
+}
+.apqp {
+  background-image: url("../files/images/bg_kosten_2.jpg");
+}
+.netzwerk {
+  background-image: url("../files/images/bg_netzwerk_2.jpg");
+}
+.mitarbeiter {
+  background-image: url("../files/images/bg_mitarbeiter_5.webp");
+}
+.kaenderung {
+  background-image: url("../files/images/bg_uni_3.webp");
+}
+.kalender {
+  background-image: url("../files/images/bg_kalender_2.jpg");
+}
+.ford {
+  background-image: url("../files/images/motorband_bg.jpg");
+}
+@for $i from 1 through 12 {
+  .errorpage#{$i} {
+    background-image: url("../files/images/404_#{$i}.webp");
+    background-position: top right;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+}
+.white-box {
+  position: absolute;
+  padding: 70px 40px 40px;
+  background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.7) 50px) top left no-repeat;
+  bottom: 30%;
+  right: 100px;
+  width: 35%;
+}
+.white-box-left {
+  background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.7) 50px) top left no-repeat;
+  padding: 70px 40px 40px;
+  margin-top: 100px;
+  margin-bottom: 50px;
+  width: 55%;
+}
+.medium-white-box-left {
+  background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.7) 50px) top left no-repeat;
+  padding: 0 10px 10px 80px;
+  width: 40%;
+  margin: 120px 0 20px 0;
+}
+.small-white-box-left {
+  background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.7) 50px) top left no-repeat;
+  padding: 0 10px 10px 80px;
+  margin-top: 75px;
+  margin-bottom: -20px;
+  width: 40%;
+}
+// Buttons
+.btn {
+  &-primary {
+    background-color: $primary-95;
+    border-color: $primary;
+  }
+
+  &-warning {
+    background-color: $warning-95;
+    border-color: $warning;
+  }
+
+  &-white {
+    background-color: $white-50;
+    border-color: $white-75;
+  }
+}
+
+// Sortable
+.ui-state-highlight {
+  background-color: $blue-gray-6;
+  border: 1px dashed $blue-gray-50;
+  height: 2rem;
+}
+.lisortable {
+  border-bottom: 1px dotted $blue-gray-50;
+  padding: .5rem 0 .3rem .5rem;
+  &:hover {
+    background: $blue-gray-6;
+    cursor: move;
+  }
+}
+.connectedSortable {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.dhover:hover {
+  background-color: $nav;
+}
+// Hinweis Container
+.hinweis_container {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+// Badge
+.badge {
+  margin-top: -.3rem;
+  padding-bottom: .5rem;
+  &-primary {
+    background-color: $primary;
+  }
+  &-warning {
+    background-color: $warning;
+  }
+  &-danger {
+    background-color: $danger;
+  }
+  &-success {
+    background-color: $success;
+  }
+  &-info {
+    background-color: $info;
+    color: $primary;
+  }
+  &-black {
+    background-color: $black;
+    color: $white;
+  }
+  &-light {
+    background-color: $blue-gray-25;
+    color: $primary;
+  }
+}
+a.badge {
+  text-decoration: none;
+  color: $white;
+  padding-bottom: .2rem;
+  &:hover {
+    color: $white;
+  }
+}
+
+// Navigation
+.nav {
+  margin-top: 50px;
+
+}
+
+// Rundes Bild
+.rund {
+  border-radius: 100%;
+  height: 8rem;
+  width: 8rem !important;
+  object-fit: cover;
+  object-position: top center;
+}
+.rund_small {
+  border-radius: 100%;
+  height: 3rem;
+  width: 3rem !important;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.small_rund {
+  border-radius: 100%;
+  height: 1.7rem;
+  width: 1.7rem !important;
+  object-fit: cover;
+  object-position: top center;
+  margin: 0.5rem 0 0 0.5rem;
+}
+
+.medium_rund {
+  border-radius: 100%;
+  height: 3.7rem;
+  width: 3.7rem !important;
+  object-fit: cover;
+  object-position: top center;
+  margin: 0.5rem 0 0 0.5rem;
+}
+
+// Alert
+.alert {
+  &-info {
+    background-color: $info;
+    color: $black;
+  }
+  &-muted {
+    background-color: $blue-gray-12;
+    color: $black;
+  }
+}
+
+// Kommentar
+.kommentar ol {
+  padding-left: 1rem !important;
+  margin: 1rem 0 !important;
+}
+.kom p {
+  margin: 0;
+  padding: 0;
+}
+.apqp_kom {
+  background: $nav;
+  & > p {
+    margin:0;
+    padding: 0;
+  }
+}
+.cost_kom {
+  background-color: $nav;
+  border-left: 2px solid $black;
+}
+
+// Dropzone
+.dropzone {
+  background-image: linear-gradient(180deg, $blue-gray-12 0%, $white 25%) !important;
+  border: 1px solid $gray-25  !important;
+  border-radius: 5px;
+  min-height: 80px !important;
+}
+.dropzone .dz-message {
+  margin: 0 !important;
+}
+
+// FORM
+.form-check { min-height: .8rem !important; }
+
+
+// X-Small devices (portrait phones, less than 576px)
+@media (max-width: 575.98px) {
+  .white-box {
+    bottom: 15%;
+    right: 5%;
+    width: 90%;
+    padding: 60px 30px 30px;
+  }
+  .login-index {
+    background-position: top center;
+  }
+  .medium-white-box-left {
+    background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.9) 50px) top left no-repeat;
+    padding: 0 10px 10px 80px;
+    width: 100%;
+    margin: 120px 0 20px 0;
+  }
+  .navbar-toggler {
+    color: $white !important;
+    border: 1px solid $white !important;
+  }
+}
+
+// DataTables
+ul.pagination {
+  font-size: .7rem;
+}
+.page-item.active .page-link {
+  background-color: $blue-gray-12;
+  border-color: $blue-gray-12;
+}
+.page-link {
+  color: $gray !important;
+}
+.table-hover > tbody > tr:hover td {
+  background-color: $blue-gray-6 !important;
+  --bs-table-accent-bg: rgba(133,149,157,.01) !important;
+  color: $black;
+}
+
+// Sortable
+.ui-state-default {
+  background-color: $white;
+  border-bottom: 1px dotted $gray-50;
+  padding: .3rem;
+  &:hover {
+    background-color: $blue-gray-6;
+    cursor: grab;
+  }
+}
+.highlight {
+  background-color: red;
+}
+
+// Drehungen
+.deg45 {
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+.deg90 {
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+}
+.degm45 {
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+.degm90 {
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+}
+.no_trans { transform: none; }
+
+// Small devices (landscape phones, less than 768px)
+@media (max-width: 767.98px) {
+
+}
+
+// Medium devices (tablets, less than 992px)
+@media (max-width: 991.98px) {
+
+}
+
+// Large devices (desktops, less than 1200px)
+@media (max-width: 1199.98px) {
+
+}
+
+// X-Large devices (large desktops, less than 1400px)
+@media (max-width: 1399.98px) {
+
+}
