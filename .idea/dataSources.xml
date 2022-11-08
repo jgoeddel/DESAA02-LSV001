@@ -9,5 +9,13 @@
       <jdbc-url>jdbc:mysql://DESAA02-LSV001:3306</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="DEHZE01-WSV575" uuid="71ed7e47-f71a-424c-b6ab-c81b202cda00">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <remarks>SQL Server Howi</remarks>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://DEHZE01-WSV575\AUSAA1:1433;database=BI_Master</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

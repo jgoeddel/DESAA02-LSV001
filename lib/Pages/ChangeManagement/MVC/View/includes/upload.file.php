@@ -61,7 +61,8 @@ if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)): // Ist die Da
         $a = ChangeManagementDatabase::run("SELECT id FROM base2files WHERE bid = '$id' AND datei = '$filename'")->fetchColumn();
         if(empty($a)):
             // Daten in die Datenbank schreiben
-            ChangeManagementDatabase::run("INSERT INTO base2files SET bid = '$id', datei = '$filename', user = '{$_SESSION['user']['dbname']}', datum = now(), typ = '$ext', size = '{$_FILES['file']['size']}', part = '2'");
+            $part = ($art == 'Datei') ? 2 : 3;
+            ChangeManagementDatabase::run("INSERT INTO base2files SET bid = '$id', datei = '$filename', user = '{$_SESSION['user']['dbname']}', datum = now(), typ = '$ext', size = '{$_FILES['file']['size']}', part = '$part'");
             ChangeManagementDatabase::setLog('Detailansicht',$id,'Dateien','0',''.$filename.' wurde auf den Server geladen',1);
         endif;
 

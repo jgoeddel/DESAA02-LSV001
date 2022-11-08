@@ -4,6 +4,8 @@ namespace App\Pages\ChangeManagement\MVC;
 
 use App\Functions\Functions;
 use App\Pages\ChangeManagement\ChangeManagementDatabase;
+use App\Pages\Home\IndexDatabase;
+use PDO;
 
 class ChangeManagementController extends \App\App\AbstractMVC\AbstractController
 {
@@ -110,6 +112,49 @@ class ChangeManagementController extends \App\App\AbstractMVC\AbstractController
         ]);
     }
 
+    # Suche
+    public function suche()
+    {
+        $parameter = $_POST['parameter'];
+        # Abfragen über die jeweiligen Bereiche
+        # Part Description (info)
+        $t1 = $this->changeManagementDatabase->treffer($parameter,'base2info','part_description');
+        $pd = $this->changeManagementDatabase->suchergebnis($parameter,'base2info','part_description');
+        # Change Description (info)
+        $t2 = $this->changeManagementDatabase->treffer($parameter,'base2info','change_description');
+        $cd = $this->changeManagementDatabase->suchergebnis($parameter,'base2info','change_description');
+        # Ersteller (base)
+        $t3 = $this->changeManagementDatabase->treffer($parameter,'base','name');
+        $er = $this->changeManagementDatabase->suchergebnis($parameter,'base','name');
+        # Nummer (base)
+        $t4 = $this->changeManagementDatabase->treffer($parameter,'base','nr');
+        $nr = $this->changeManagementDatabase->suchergebnis($parameter,'base','nr');
+        # Sachnummer (base2partno)
+        $t5 = $this->changeManagementDatabase->treffer($parameter,'base2partno','alt');
+        $alt = $this->changeManagementDatabase->suchergebnis($parameter,'base2partno','alt');
+        # Sachnummer (base2partno)
+        $t6 = $this->changeManagementDatabase->treffer($parameter,'base2partno','neu');
+        $neu = $this->changeManagementDatabase->suchergebnis($parameter,'base2partno','neu');
+
+        # Übergabe
+        $this->pageload("ChangeManagement", "includes/suchergebnis", [
+            't1' => $t1,
+            't2' => $t2,
+            't3' => $t3,
+            't4' => $t4,
+            't5' => $t5,
+            't6' => $t6,
+            'pd' => $pd,
+            'cd' => $cd,
+            'er' => $er,
+            'nr' => $nr,
+            'alt' => $alt,
+            'neu' => $neu,
+            'parameter' => $parameter
+        ]);
+
+    }
+
     # vererinfachten Durchlauf durchführen
     public function simpleChange()
     {
@@ -187,6 +232,70 @@ class ChangeManagementController extends \App\App\AbstractMVC\AbstractController
             'bilder' => $bilder
         ]);
     }
+    # Angebote laden
+    public function angebote()
+    {
+        # Parameter
+        $id = Functions::decrypt($_GET['id']);
+
+        # Einträge (Change Management)
+        $row = $this->changeManagementDatabase->getElement($id);
+        $ersteller = $this->changeManagementDatabase->getErsteller($id);
+        $info = $this->changeManagementDatabase->getInfo($id);
+        $dateien = $this->changeManagementDatabase->getDateien($id, 3);
+
+        # Übergabe
+        $this->pageload("ChangeManagement", "angebote", [
+            'row' => $row,
+            'id' => $id,
+            'ersteller' => $ersteller,
+            'info' => $info,
+            'dateien' => $dateien
+        ]);
+    }
+    # Mitarbeiter Angebote laden (Ajax)
+    public function getMaAngebot()
+    {
+        $ma = IndexDatabase::selectMaCC($_POST['location']);
+        $maa = $this->changeManagementDatabase->getMaAngebot($_POST['id']);
+        $row = $this->changeManagementDatabase->getElement($_POST['id']);
+        # Übergabe
+        $this->pageload("ChangeManagement", "includes/getMaAngebot",[
+            'ma' => $ma,
+            'id' => $_POST['id'],
+            'location' => $_POST['location'],
+            'maa' => $maa,
+            'row' => $row
+        ]);
+    }
+    # Leserechte von Mitarbeiter zu Angebote speichern
+    public function setMaAngebot()
+    {
+        $post = $_POST;
+        $this->changeManagementDatabase->setMaAngebot($post);
+    }
+    # Alle Angebote abrufen
+    public function getAngebote()
+    {
+        $dateien = $this->changeManagementDatabase->getDateien($_POST['id'],3);
+        $row = $this->changeManagementDatabase->getElement($_POST['id']);
+        # Übergabe
+        $this->pageload("ChangeManagement", "includes/getAngebote", [
+            'dateien' => $dateien,
+            'id' => $_POST['id'],
+            'row' => $row
+        ]);
+    }
+    # Berechtigung Angebote
+    public function setAccess()
+    {
+        $this->changeManagementDatabase->setAccess($_POST['part'],$_POST['bid'],$_POST['mid']);
+    }
+    #Datei löschen
+    public function deleteFile()
+    {
+        $this->changeManagementDatabase->deleteFile($_POST['id']);
+    }
 
     # LOP laden
     public function lop()
@@ -240,7 +349,6 @@ class ChangeManagementController extends \App\App\AbstractMVC\AbstractController
     # Meetings laden
     public function getMeetings()
     {
-        # Einträge (Change Management)
         $row = $this->changeManagementDatabase->getElement($_POST['id']);
         # Übergabe
         $this->pageload("ChangeManagement", "includes/getMeetings", [
@@ -248,6 +356,9 @@ class ChangeManagementController extends \App\App\AbstractMVC\AbstractController
             'row' => $row
         ]);
     }
+
+
+
     # Meetingeintrag speichern
     public function setMeeting()
     {
@@ -260,6 +371,7 @@ class ChangeManagementController extends \App\App\AbstractMVC\AbstractController
         $post = $_POST;
         $this->changeManagementDatabase->setMaMeeting($post);
     }
+
 
     # Partno laden
     public function partno()
@@ -351,6 +463,20 @@ class ChangeManagementController extends \App\App\AbstractMVC\AbstractController
 
         # Übergabe
         $this->pageload("ChangeManagement", "includes/upload.file", [
+            'post' => $post,
+            'id' => $id
+        ]);
+    }
+
+    # Angebot speichern
+    public function setAngebot()
+    {
+        # Parameter
+        $post = $_POST;
+        $id= $_POST['id'];
+
+        # Übergabe
+        $this->pageload("ChangeManagement", "includes/upload.angebot", [
             'post' => $post,
             'id' => $id
         ]);

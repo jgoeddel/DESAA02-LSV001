@@ -8,6 +8,7 @@ use App\Formular\Formular;
 use App\Functions\Functions;
 use App\Pages\Home\IndexDatabase;
 use PDO;
+use PDOStatement;
 
 class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
 {
@@ -17,19 +18,48 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         return $table;
     }
 
+    # Datenbankzugriff für ChangeManagement Tabelle
+    public static function dbcm(): PDO
+    {
+        $dataSource = "mysql:host=localhost;dbname=rhs_cm";
+        $pdo = new PDO($dataSource, $_SESSION['db']['user'], $_SESSION['db']['pass']);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        return $pdo;
+    }
+
+    # Datenbankzugriff für Admintabellen
+    public static function dba(): PDO
+    {
+        $dataSource = "mysql:host=localhost;dbname=rhs_admin";
+        $pdo = new PDO($dataSource, $_SESSION['db']['user'], $_SESSION['db']['pass']);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        return $pdo;
+    }
+
+    # Kurzform Abfrage
+    public static function run($sql, $bind = NULL): bool|PDOStatement
+    {
+        $stmt = self::dbcm()->prepare($sql);
+        $stmt->execute($bind);
+        return $stmt;
+    }
+
+    public static function runa($sql, $bind = NULL): bool|PDOStatement
+    {
+        $stmt = self::dba()->prepare($sql);
+        $stmt->execute($bind);
+        return $stmt;
+    }
+
+
     # Ruft alle Einträge nach Status / Jahr und Location aus der Datenbank ab
     public function getElements($jahr, $status): bool|array
     {
         $sql = "SELECT *, DATE_FORMAT(datum, '%d.%m.%Y') AS datum ";
         $sql .= "FROM base WHERE datum LIKE '$jahr%' ";
         $sql .= "AND status < '$status' ";
-        if (!empty($_SESSION['user']['citycode'])):
-            $sql .= "AND location = '{$_SESSION['user']['citycode']}' ";
-        endif;
         $sql .= "ORDER BY id DESC";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
     }
 
     # Value ändern
@@ -72,7 +102,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     public function changeVerantwortung($bid, $uid)
     {
         $sql = "SELECT * FROM b_mitarbeiter WHERE id = ?";
-        $a = self::runa($sql, [$uid])->fetch(\PDO::FETCH_OBJ);
+        $a = self::runa($sql, [$uid])->fetch(PDO::FETCH_OBJ);
         $sql = "UPDATE base SET name = '$a->vorname $a->name', mid = ? WHERE id = ? LIMIT 1";
         self::run($sql, [$uid, $bid]);
     }
@@ -90,6 +120,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     # APQP setzen (User)
     public function setAPQP($bid, $apqp, $part, $antwort)
     {
+        $status = self::run("SELECT status FROM base WHERE id = '$bid'")->fetchColumn();
         $sql = "SELECT id FROM base2apqp WHERE bid = ? AND apqp = ? AND part = ?";
         $a = self::run($sql, [$bid, $apqp, $part])->fetchColumn();
         if ($antwort == 'nio') $aid = 1;
@@ -103,6 +134,16 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $prt = ($part == 1) ? 'Evaluation' : 'Tracking';
         self::run($sql, [$antwort, $bid, $apqp, $part]);
         self::setLog('' . $prt . ' bearbeitet', $bid, '' . $part . '', $apqp, '' . $prt . ' dieses Punktes mit ' . $antwort . ' bewertet.', 1);
+        # Status ändern, wenn der erste Punkt der Evaluation bearbeitet wurde
+        $anz = self::run("SELECT COUNT(id) FROM base2apqp WHERE bid = '$bid' AND aid > 0 AND part = '1'")->fetchColumn();
+        if($anz == 1){
+            self::run("UPDATE base SET status = '2' WHERE id = '$bid' LIMIT 1");
+        }
+        # Status ändern, wenn alle Punkte der Evaluation bearbeitet wurden
+        if(self::countOpenEvaluation($bid,1) == 0 && $status < 3){
+            $sql = "UPDATE base SET status = '3' WHERE id = '$bid' LIMIT 1";
+            self::run($sql);
+        }
         # Auftrag beenden, wenn alle Punkte erfüllt sind
         if (self::checkAuftrag($bid) == 0) self::finishID($bid);
     }
@@ -111,21 +152,21 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     public function getGMAS($bid): bool|array
     {
         $sql = "SELECT * FROM base2gmas WHERE bid = ?";
-        return self::run($sql, [$bid])->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid])->fetchAll(PDO::FETCH_OBJ);
     }
 
     # NAEL abrufen
     public function getNAEL($bid): bool|array
     {
         $sql = "SELECT * FROM base2nael WHERE bid = ?";
-        return self::run($sql, [$bid])->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid])->fetchAll(PDO::FETCH_OBJ);
     }
 
     # PART NO abrufen
     public function getPartNo($bid, $part): bool|array
     {
         $sql = "SELECT * FROM base2" . $part . " WHERE bid = ?";
-        return self::run($sql, [$bid])->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid])->fetchAll(PDO::FETCH_OBJ);
     }
 
     # Part No eintragen
@@ -289,12 +330,14 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         self::run($sql);
     }
 
+
     # Mitarbeiter im Meeting
     public static function checkMaMeeting($mid, $uid)
     {
         $sql = "SELECT id FROM meeting2user WHERE mid = ? AND uid = ?";
         return self::run($sql, [$mid, $uid])->fetchColumn();
     }
+
 
     # Alle Mitarbeiter im Meeting
     public static function getMaMeeting($mid)
@@ -303,18 +346,59 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         return self::run($sql, [$mid])->fetchAll(PDO::FETCH_OBJ);
     }
 
+
+
+    # ANGEBOTE - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Prüfe die Berechtigung des Mitarbeiters
+    public static function checkMaAngebot($mid, $bid)
+    {
+        $sql = "SELECT * FROM base2angebot WHERE mid = '$mid' AND bid = '$bid'";
+        return self::run($sql)->fetch(PDO::FETCH_OBJ);
+    }
+    # Berechtigung für einen Mitarbeiter hinzufügen oder löschen
+    public function setMaAngebot($post)
+    {
+        foreach ($post as $key => $value) {
+            $$key = $value;
+        }
+        if (empty(self::checkMaAngebot($mid, $bid))) {
+            $sql = "INSERT INTO base2angebot SET mid = '$mid', ";
+            $sql.= "bid = '$bid', ";
+            $sql.= "mitarbeiter = '{$_SESSION['user']['dbname']}', ";
+            $sql.= "datum = now(), ";
+            $sql.= "aread = '1'";
+        } else {
+            $sql = "DELETE FROM base2angebot WHERE mid = '$mid' AND bid = '$bid' LIMIT 1";
+        }
+        self::run($sql);
+    }
+    # Alle Mitarbeiter mit Berechtigungen abrufen
+    public function getMaAngebot($bid)
+    {
+        $sql = "SELECT * FROM base2angebot WHERE bid = '$bid'";
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
+    }
+    # Alle Dateien zählen (nach Bereich)
+    public static function countFiles($bid,$bereich)
+    {
+        $sql = "SELECT COUNT(id) AS anzahl FROM base2files WHERE bid = '$bid' AND part = '$bereich'";
+        return self::run($sql)->fetchColumn();
+    }
+
+
+
     # Quelle abrufen
     public static function getQuelle(): bool|array
     {
         $sql = "SELECT * FROM quelle ORDER BY id";
-        return self::run($sql)->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
     }
 
     # Change Type abrufen
     public static function getChangeType(): bool|array
     {
         $sql = "SELECT * FROM changetype ORDER BY id";
-        return self::run($sql)->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
     }
 
     # Abweichung abrufen
@@ -336,7 +420,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     {
         $pepper = '%Wa5manhalts01nd13Dat3nbank5chr31bt?';
         $row = self::runa("SELECT * FROM b_mitarbeiter WHERE username = '{$_SESSION['user']['username']}'")->fetch(PDO::FETCH_OBJ);
-        $valid = password_verify($password . $pepper, $row->password);
+        $valid = password_verify($password, $row->password);
         if ($valid === true) {
             # Antwort
             if ($antwort == 'nio') $aid = 1;
@@ -507,45 +591,10 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     }
 
 
-
-    # Statische Methoden
-    # Datenbankzugriff für ChangeManagement Tabelle
-    public static function dbcm(): PDO
-    {
-        $dataSource = "mysql:host=localhost;dbname=rhs_cm";
-        $pdo = new \PDO($dataSource, $_SESSION['db']['user'], $_SESSION['db']['pass']);
-        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        return $pdo;
-    }
-
-    # Datenbankzugriff für Admintabellen
-    public static function dba(): PDO
-    {
-        $dataSource = "mysql:host=localhost;dbname=rhs_admin";
-        $pdo = new \PDO($dataSource, $_SESSION['db']['user'], $_SESSION['db']['pass']);
-        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        return $pdo;
-    }
-
-    # Kurzform Abfrage
-    public static function run($sql, $bind = NULL): bool|\PDOStatement
-    {
-        $stmt = self::dbcm()->prepare($sql);
-        $stmt->execute($bind);
-        return $stmt;
-    }
-
-    public static function runa($sql, $bind = NULL): bool|\PDOStatement
-    {
-        $stmt = self::dba()->prepare($sql);
-        $stmt->execute($bind);
-        return $stmt;
-    }
-
     # Einen Eintrag abrufen
     public static function getElement($id)
     {
-        return self::run("SELECT *, DATE_FORMAT(datum, '%d.%m.%Y') AS tag FROM base WHERE id = ?", [$id])->fetch(\PDO::FETCH_OBJ);
+        return self::run("SELECT *, DATE_FORMAT(datum, '%d.%m.%Y') AS tag FROM base WHERE id = ?", [$id])->fetch(PDO::FETCH_OBJ);
     }
 
     # Informationen zu ID abrufen
@@ -554,7 +603,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql = "SELECT *, DATE_FORMAT(zieldatum, '%d.%m.%Y') AS ziel ";
         $sql .= "FROM base2info ";
         $sql .= "WHERE bid = ?";
-        return self::run($sql, [$bid])->fetch(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid])->fetch(PDO::FETCH_OBJ);
     }
 
     # Informationen zur Location abrufen
@@ -563,7 +612,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql = "SELECT location, citycode, cur ";
         $sql .= "FROM location ";
         $sql .= "WHERE citycode = ?";
-        return self::run($sql, [$citycode])->fetch(\PDO::FETCH_OBJ);
+        return self::run($sql, [$citycode])->fetch(PDO::FETCH_OBJ);
     }
 
     # Gab es eine Änderung seit dem letzten Besuch
@@ -632,7 +681,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     public static function base2gmas($bid)
     {
         $sql = "SELECT * FROM base2gmas WHERE bid = ?";
-        return self::run($sql, [$bid])->fetch(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid])->fetch(PDO::FETCH_OBJ);
     }
 
     # Zählt Einträge im Logbuch
@@ -667,14 +716,14 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     public static function pla2evaluation($bid): bool|array
     {
         $sql = "SELECT * FROM pla2evaluation WHERE bid = ?";
-        return self::run($sql, [$bid])->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid])->fetchAll(PDO::FETCH_OBJ);
     }
 
     # Alle erforderlichen Elemente des Trackings
     public static function imp2tracking($bid): bool|array
     {
         $sql = "SELECT * FROM imp2tracking WHERE bid = ?";
-        return self::run($sql, [$bid])->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid])->fetchAll(PDO::FETCH_OBJ);
     }
 
     # Evaluation Status
@@ -754,7 +803,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql = "SELECT mid FROM base WHERE id = ?";
         $mid = self::run($sql, [$bid])->fetchColumn();
         $sql = "SELECT * FROM b_mitarbeiter WHERE id = ?";
-        return self::runa($sql, [$mid])->fetch(\PDO::FETCH_OBJ);
+        return self::runa($sql, [$mid])->fetch(PDO::FETCH_OBJ);
     }
 
     # Implement Date
@@ -808,7 +857,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     {
         $summe = 0;
         $sql = "SELECT * FROM base2apqp WHERE bid = ? AND bereich = ? AND part = ?";
-        $a = self::run($sql, [$bid, $bereich, $part])->fetchAll(\PDO::FETCH_OBJ);
+        $a = self::run($sql, [$bid, $bereich, $part])->fetchAll(PDO::FETCH_OBJ);
         if (!empty($a)) {
             foreach ($a as $b) {
                 $sql = "SELECT kosten FROM apqp2cost WHERE base_apqp = '$b->id'";
@@ -863,8 +912,8 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     # Anzahl noch nicht bearbeiteter Punkte über alle Bereiche
     public static function countOpenEvaluation($bid, $part)
     {
-        $sql = "SELECT COUNT(id) FROM base2apqp WHERE bid = ? AND antwort IS NULL AND part = ?";
-        return self::run($sql, [$bid, $part])->fetchColumn();
+        $sql = "SELECT COUNT(id) FROM base2apqp WHERE bid = '$bid' AND antwort IS NULL AND part = ?";
+        return self::run($sql, [$part])->fetchColumn();
     }
 
     # Alle APQP Elemente einer Anfrage in einem Bereich
@@ -873,7 +922,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql = "SELECT *, DATE_FORMAT(datum, '%d.%m.%Y') as tag, ";
         $sql .= "DATE_FORMAT(datum, '%H:%i:%s') as zeit FROM base2apqp ";
         $sql .= "WHERE bid = ? AND part = ? AND bereich = ?";
-        return self::run($sql, [$bid, $part, $bereich])->fetchAll(\PDO::FETCH_OBJ);
+        return self::run($sql, [$bid, $part, $bereich])->fetchAll(PDO::FETCH_OBJ);
     }
 
     # Bereich ausschreiben
@@ -1119,7 +1168,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         # Nummer erstellen
         $nr = self::createNumber();
         echo "$nr|$part_description";
-        # Bese speichern
+        # Base speichern
         $sql = "INSERT INTO base SET location = '$citycode', ";
         $sql .= "name = '{$_SESSION['user']['dbname']}', ";
         $sql .= "status = '0', ";
@@ -1129,6 +1178,8 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql .= "nr = '$nr'";
         self::run($sql, [$start]);
         $baseid = self::run("SELECT id FROM base WHERE nr = '$nr'")->fetchColumn();
+        # Schreibrechte Angebote speichern
+        self::run("INSERT INTO base2angebot SET mid = '{$_SESSION['user']['id']}', bid = '$baseid', awrite = '1', mitarbeiter = '{$_SESSION['user']['dbname']}', datum = now()");
 
         # Parameter setzen und speichern
         $pgmas = (!isset($gmas)) ? 0 : 1;
@@ -1338,6 +1389,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
     # Teilenummer eintragen
     public static function insertPartNo($row, $id, $lid, $ziel)
     {
+        var_dump($row);
         if (!isset($row[7]) || $row[7] == '') $row[7] = $ziel;
         $sql = "INSERT INTO base2partno SET anlage = '$row[1]', ";
         $sql .= "bezeichnung = '$row[2]', ";
@@ -1351,6 +1403,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql .= "status = '0', ";
         $sql .= "citycode = '{$_SESSION['wrk']['citycode']}', ";
         $sql .= "lid = '$lid'";
+        echo $sql;
         self::run($sql);
     }
 
@@ -1547,7 +1600,7 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql = "SELECT *, DATE_FORMAT(datum, '%d.%m.%Y') as tag, ";
         $sql .= "DATE_FORMAT(datum, '%H:%i:%s') as zeit FROM base2apqp ";
         $sql .= "WHERE apqp = ?  AND bid = ? AND part = ?";
-        return self::run($sql, [$apqp, $bid, $part])->fetch(\PDO::FETCH_OBJ);
+        return self::run($sql, [$apqp, $bid, $part])->fetch(PDO::FETCH_OBJ);
     }
     # Tracking / Evaluation bearbeiten
 
@@ -1702,5 +1755,40 @@ class ChangeManagementDatabase extends \App\App\AbstractMVC\AbstractDatabase
 
     }
 
+    # Suche
+    public function treffer($parameter, $table, $feld)
+    {
+        return self::run("SELECT COUNT(id) AS anzahl FROM ". $table ." WHERE BINARY ". $feld ." LIKE '%$parameter%'")->fetchColumn();
+    }
+    public function suchergebnis($parameter, $table, $feld)
+    {
+        return self::run("SELECT * FROM ". $table ." WHERE BINARY ". $feld ." LIKE '%$parameter%' LIMIT 10")->fetchAll(PDO::FETCH_OBJ);
+    }
+    public static function dspParameter($table,$feld,$parameter,$bid)
+    {
+        return self::run("SELECT ". $feld ." FROM ". $table ." WHERE ". $parameter ." = '$bid'")->fetchColumn();
+    }
 
+    # Datei löschen
+    public function deleteFile($id)
+    {
+        $datei = self::run("SELECT * FROM base2files WHERE id = '$id'");
+        self::run("DELETE FROM base2files WHERE id = '$id' LIMIT 1");
+        $file = Functions::getBaseURL()."lib/Pages/ChangeManagement/MVC/View/files/".$datei->datei;
+        unset($file);
+    }
+
+    # Berechtigung Angebot ändern
+    public function setAccess($part,$bid,$mid)
+    {
+        if($part == 'awrite') {
+            $sql = "UPDATE base2angebot SET awrite = '1' WHERE bid = '$bid' AND mid = '$mid' LIMIT 1";
+            echo $sql;
+            self::run($sql);
+        } else {
+            $sql = "UPDATE base2angebot SET awrite = '0' WHERE bid = '$bid' AND mid = '$mid' LIMIT 1";
+            echo $sql;
+            self::run($sql);
+        }
+    }
 }

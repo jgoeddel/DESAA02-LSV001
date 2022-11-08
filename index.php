@@ -124,7 +124,7 @@ if ($request == "/") {
     $router->add("rotationsplanController", "setSchicht");
 
     # Change Management
-} elseif ($request == "/changeManagement") { # Change Management: Detailansicht
+} elseif ($request == "/changeManagement") { # Change Management: Startseite
     $router->add("changeManagementController", "index");
 } elseif ($request == "/changeManagement/details") { # Change Management: Detailansicht
     $router->add("changeManagementController", "details");
@@ -180,6 +180,8 @@ if ($request == "/") {
     $router->add("changeManagementController", "setAntwortCom");
 } elseif ($request == "/changeManagement/aktionen") { # Change Management: Seite mit den Aktionen
     $router->add("changeManagementController", "aktionen");
+} elseif ($request == "/changeManagement/angebote") { # Change Management: Seite mit den Angeboten
+    $router->add("changeManagementController", "angebote");
 } elseif ($request == "/changeManagement/setFreigabe") { # Change Management: Freigabe
     $router->add("changeManagementController", "setFreigabe");
 } elseif ($request == "/changeManagement/abschliessen") { # Change Management: Abschliessen
@@ -220,14 +222,26 @@ if ($request == "/") {
     $router->add("changeManagementController", "meeting");
 } elseif ($request == "/changeManagement/getMeetings") { # Change Management: Meetings anzeigen (AJAX)
     $router->add("changeManagementController", "getMeetings");
+} elseif ($request == "/changeManagement/getAngebote") { # Change Management: Angebote anzeigen (AJAX)
+    $router->add("changeManagementController", "getAngebote");
 } elseif ($request == "/changeManagement/setMeeting") { # Change Management: Meetings speichern (AJAX)
     $router->add("changeManagementController", "setMeeting");
 } elseif ($request == "/changeManagement/setMaMeeting") { # Change Management: Meetings Mitarbeiter dazu (AJAX)
     $router->add("changeManagementController", "setMaMeeting");
+} elseif ($request == "/changeManagement/setMaAngebot") { # Change Management: Angebote Mitarbeiter dazu (AJAX)
+    $router->add("changeManagementController", "setMaAngebot");
+} elseif ($request == "/changeManagement/getMaAngebot") { # Change Management: Angebote Mitarbeiter (AJAX)
+    $router->add("changeManagementController", "getMaAngebot");
 } elseif ($request == "/changeManagement/checkAuftrag") { # Change Management: Auftrag Status prüfen (AJAX)
     $router->add("changeManagementController", "checkAuftrag");
 } elseif ($request == "/changeManagement/getAPQPElement") { # Change Management: APQP Evaluation
     $router->add("changeManagementController", "getAPQPElement");
+} elseif ($request == "/changeManagement/suche") { # Change Management: Suche
+    $router->add("changeManagementController", "suche");
+} elseif ($request == "/changeManagement/deleteFile") { # Change Management: Datei löschen
+    $router->add("changeManagementController", "deleteFile");
+} elseif ($request == "/changeManagement/setAccess") { # Change Management: Berechtigung Angebot
+    $router->add("changeManagementController", "setAccess");
 
 
 # Administration
@@ -284,14 +298,37 @@ if ($request == "/") {
     $router->add("produktionController", "tableCalloffs");
 }  elseif ($request == "/produktion/motorband/fabMotorband") { # Produktion: Startseite
     $router->add("produktionController", "fabMotorband");
-} elseif ($request == "/ajaxGetProduktionKW") {
-    $router->add("produktionController", "ajaxGetProduktionKW"); # Produktionszahlen (Aktuell)
-} elseif ($request == "/ajaxGetProduktionChart") {
-    $router->add("produktionController", "ajaxGetProduktionChart"); # Produktionszahlen (Aktuell)
-} elseif ($request == "/produktion/bandsicherung") {
-    $router->add("produktionController", "bandsicherung"); # Bandsicherung iSeries
-} elseif ($request == "/produktion/frontcorner/logfiles") {
-    $router->add("produktionController", "logfilesFrontcorner"); # Bandsicherung iSeries
+} elseif ($request == "/produktion/motorband/taktzeit") { # Taktzeit Motorband
+    $router->add("produktionController", "taktMotorband");
+} elseif ($request == "/ajaxGetProduktionKW") { # Produktionszahlen (Aktuell)
+    $router->add("produktionController", "ajaxGetProduktionKW");
+} elseif ($request == "/ajaxGetProduktionChart") { # Produktionszahlen (Aktuell)
+    $router->add("produktionController", "ajaxGetProduktionChart");
+} elseif ($request == "/produktion/bandsicherung") { # Bandsicherung iSeries
+    $router->add("produktionController", "bandsicherung");
+} elseif ($request == "/produktion/bandsicherung/insert") { # Bandsicherung iSeries speichern
+    $router->add("produktionController", "insertBandsicherung");
+} elseif ($request == "/produktion/frontcorner/logfiles") { # Frontcorner: Logfiles (funktioniert noch nicht)
+    $router->add("produktionController", "logfilesFrontcorner");
+} elseif ($request == "/produktion/frontcorner/dashboard") { # Frontcorner: Dashboard
+    $router->add("produktionController", "dashboardFrontcorner");
+} elseif ($request == "/produktion/frontcorner/dashboard/show") { # Frontcorner: Dashboard (inlude)
+    $router->add("produktionController", "dspDashboardFrontcorner");
+} elseif ($request == "/produktion/frontcorner/dashboard/showStation") { # Frontcorner: Dashboard (eine Station)
+    $router->add("produktionController", "dspStationDashboardFrontcorner");
+
+
+# Produktionsanzeigen
+}  elseif ($request == "/prodview") { # Produktionsanzeigen: Startseite
+    $router->add("prodviewController", "index");
+}  elseif ($request == "/prodview/linien/stationen") { # Produktionsanzeigen: Stationen einer Linie anzeigen
+    $router->add("prodviewController", "getStationen");
+}  elseif ($request == "/prodview/linien/station") { # Produktionsanzeigen: Eine Station anzeigen
+    $router->add("prodviewController", "getStation");
+}  elseif ($request == "/prodview/citycode") { # Produktionsanzeigen: Eingetragene Citycodes
+    $router->add("prodviewController", "citycode");
+}  elseif ($request == "/prodview/linien/line") { # Produktionsanzeigen: Dashboard Line
+    $router->add("prodviewController", "line");
 
 # Email
 }  elseif ($request == "/email/neu/cm") { # Neuer Changemanagement Eintrag
@@ -299,9 +336,46 @@ if ($request == "/") {
 
 
 # Kalender
-}  elseif ($request == "/kalender") { # Netzwerk Übersicht Ring 7
+}  elseif ($request == "/kalender") { # Kalender Startseite
     $router->add("kalenderController", "index");
 
+# Schulungen
+}  elseif ($request == "/schulungen") { # Schulungen: Startseite
+    $router->add("schulungenController", "index");
+}  elseif ($request == "/schulungen/insertSchulung") { # Schulungen: neue Schulung speichern
+    $router->add("schulungenController", "insertSchulung");
+
+# Servicedesk
+}  elseif ($request == "/servicedesk") { # Servicedesk: Startseite
+    $router->add("servicedeskController", "index");
+}  elseif ($request == "/servicedesk/insert") { # Servicedesk: Neuer Eintrag
+    $router->add("servicedeskController", "insert");
+}  elseif ($request == "/servicedesk/details") { # Servicedesk: Details Eintrag
+    $router->add("servicedeskController", "details");
+}  elseif ($request == "/servicedesk/meinAuftrag") { # Servicedesk: Auftrag übernehmen
+    $router->add("servicedeskController", "meinAuftrag");
+}  elseif ($request == "/servicedesk/deinAuftrag") { # Servicedesk: Auftrag delegieren
+    $router->add("servicedeskController", "deinAuftrag");
+}  elseif ($request == "/servicedesk/start") { # Servicedesk: Auftrag starten
+    $router->add("servicedeskController", "start");
+}  elseif ($request == "/servicedesk/pause") { # Servicedesk: Auftrag Pause
+    $router->add("servicedeskController", "pause");
+}  elseif ($request == "/servicedesk/weiter") { # Servicedesk: Auftrag weiter
+    $router->add("servicedeskController", "weiter");
+}  elseif ($request == "/servicedesk/beenden") { # Servicedesk: Auftrag beenden
+    $router->add("servicedeskController", "beenden");
+}  elseif ($request == "/servicedesk/nio") { # Servicedesk: Auftrag nio
+    $router->add("servicedeskController", "nio");
+}  elseif ($request == "/servicedesk/abschluss") { # Servicedesk: Auftrag abschließen
+    $router->add("servicedeskController", "abschluss");
+}  elseif ($request == "/servicedesk/kommentar/insert") { # Servicedesk: Kommentar speichern
+    $router->add("servicedeskController", "insertKommentar");
+}  elseif ($request == "/servicedesk/upload") { # Servicedesk: Fileupload
+    $router->add("servicedeskController", "upload");
+}  elseif ($request == "/servicedesk/deleteFile") { # Servicedesk: Datei löschen
+    $router->add("servicedeskController", "deleteFile");
+}  elseif ($request == "/servicedesk/archiv") { # Servicedesk: Archiv
+    $router->add("servicedeskController", "archiv");
 
 
 

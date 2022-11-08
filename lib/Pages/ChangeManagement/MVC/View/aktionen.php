@@ -131,7 +131,7 @@ $edit = ($seiteschreiben == 1 && $row->status < 6) ? 1 : 0;
                         else:
                             # Alte Teile
                             $old = ChangeManagementDatabase::isOldPart($id);
-                            if($old === 0): ?>
+                            if($old === 0 && $row->status == 7): ?>
                                 <div class="border__bottom--dotted-gray mb-3 pb-3">
                                     <h3 class="border__bottom--dotted-gray mb-3 pb-3"><?= $_SESSION['text']['h_alteTeile'] ?></h3>
                                     <p>Laden Sie bitte den Nachweis der Verschrottung alter Teile im Bereich Dateien auf den Server. Anschliessend bestätigen Sie bitte durch ihr Passwort, dass diese Aktion durchgeführt wurde. Erst danach können Sie die Anfrage ins Archiv verschieben.</p>
@@ -265,6 +265,42 @@ $edit = ($seiteschreiben == 1 && $row->status < 6) ? 1 : 0;
                                     <div class="text-end mt-2">
                                         <input type="submit" class="btn btn-danger oswald text-uppercase"
                                                value="<?= $_SESSION['text']['h_kaLoeschen'] ?>">
+                                    </div>
+                                </form>
+                            </div><!-- mb-3 -->
+                        <?php
+                        endif;
+                        # Beenden
+                        if ($row->status === 6): # Tracking ist beendet.
+                            $fehler = ChangeManagementDatabase::getNIO($id, 2)
+                            ?>
+                            <div class="border__bottom--dotted-gray mb-3 pb-3">
+                                <h3 class="border__bottom--dotted-gray mb-3 pb-3">Beenden</h3>
+                                <p>Es wurden alle Punkte des Trackings durchgeführt. Hierbei wurden <b><?= $fehler ?></b> Einträge als <b>n.i.O.</b> gekennzeichnet. Treffen Sie bitte Ihre Auswahl, tragen Sie Ihr Passwort ein und klicken Sie anschließend auf den Button "AKTION SPEICHERN".</p>
+                            </div><!-- mb-3 -->
+                            <div class="">
+                                <form id="abschliessen" class="" method="post">
+                                    <input type="hidden" name="id" value="<?= $id ?>">
+                                    <div class="row border__bottom--dotted-gray mb-3 pb-3">
+                                        <div class="col-8 border__right--dotted-gray">
+                                            <div class="me-3">
+                                                <select name="antwort" class="invisible-formfield" required>
+                                                    <option value=""><?= $_SESSION['text']['i_selectOption'] ?></option>
+                                                    <option value="4"><?= $_SESSION['text']['s_ablehnen'] ?></option>
+                                                    <option value="5"><?= $_SESSION['text']['s_freigeben'] ?></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="ms-3">
+                                                <input type="password" id="password" name="password" class="invisible-formfield"
+                                                       placeholder="<?= $_SESSION['text']['h_passwort'] ?>?" required>
+                                            </div>
+                                        </div>
+                                    </div><!-- row -->
+                                    <div class="text-end mt-2">
+                                        <input type="submit" class="btn btn-primary oswald text-uppercase"
+                                               value="<?= $_SESSION['text']['b_aktionSpeichern'] ?>">
                                     </div>
                                 </form>
                             </div><!-- mb-3 -->

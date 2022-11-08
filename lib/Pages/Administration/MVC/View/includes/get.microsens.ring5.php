@@ -24,7 +24,7 @@
             $c = explode(":", $a[2]);
             $x = $c[0] . " Stunde(n) und " . $c[1] . " Minute(n)";
             $a[2] = $c[0]."<small class='font-size-12'>STD</small>";
-            $realcolor = 'danger';
+            $realcolor = 'danger text-white';
         }
         $y = snmp2_get($host, "public", ".1.3.6.1.4.1.3181.10.3.1.5.0");
         $y = str_replace("STRING: ", "", $y);

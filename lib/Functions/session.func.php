@@ -47,6 +47,11 @@ $_SESSION['corner']['server'] = "172.16.101.101, 1433";
 $_SESSION['corner']['database'] = "PTSFC";
 $_SESSION['corner']['uid'] = "PTS2";
 $_SESSION['corner']['pwd'] = "PTS";
+# SQL Server Howi (Produktion)
+$_SESSION['WSV575']['server'] = "DEHZE01-WSV575\AusAA1, 1433";
+$_SESSION['WSV575']['database'] = "BI_Master";
+$_SESSION['WSV575']['uid'] = "BI_User";
+$_SESSION['WSV575']['pwd'] = "Rhenus2022!"; # b1hCg25tHXzrC3PLCiLO
 
 # Wenn keine Sessionparameter vorhanden sind sollen die aktuellen Werte übernommmen werden
 if (!isset($_SESSION['wrk']['jahr']) || $_SESSION['wrk']['jahr'] < $_SESSION['parameter']['start']) $_SESSION['wrk']['jahr'] = $_SESSION['parameter']['jahr'];
@@ -101,3 +106,12 @@ if(!empty($_GET['jahr'])): // Jahr
 endif;
 // Anzahl der Monate
 ($_SESSION['wrk']['jahr'] == $_SESSION['parameter']['jahr']) ? $dspMonat = DATE('n') : $dspMonat = '12';
+
+
+# Produktionsanzeige
+$_SESSION['line'][1] = 10;
+$_SESSION['line'][2] = 14;
+$_SESSION['line'][3] = 20;
+$_SESSION['line'][4] = 39;
+$_SESSION['line'][5] = 43;
+$_SESSION['line'][6] = 47;

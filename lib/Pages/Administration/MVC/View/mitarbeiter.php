@@ -210,8 +210,10 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['te
                                 $vletter = substr($row->vorname, 0, 1);
                                 $mid = Functions::encrypt($row->id);
                                 $rfid = ($row->rfid) ? '<i class="fa fa-rss text-primary ps-1"></i>' : '';
+                                $ml = ($row->email) ? '<i class="fa fa-envelope text-gray ps-1"></i>' : '';
                                 $lg = (!$row->datum) ? '<i class="fa fa-times text-danger ps-1"></i>' : '';
-                                $login = (!$row->datum) ? 'Noch keine Anmeldungen registriert' : $row->login.' Uhr';
+                                $dsplogin = (!$row->datum) ? ''.$_SESSION['text']['i_keineAnmeldung'].'' : $row->login.' Uhr';
+                                $login = ($row->status == 1) ? ''.$dsplogin.'' : '<i class="fa fa-exclamation-triangle text-warning me-2"></i><b>'.$_SESSION['text']['i_mitarbeiterGesperrt'].'</b>';
                                 if ($row->bild == '') $row->bild = "avatar.jpg";
                                 if (IndexDatabase::checkRechteCitycode($row->citycode) > 0):
                                     ?>
@@ -232,6 +234,7 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['te
                                                         <?= $row->citycode ?>
                                                         <span class="float-end">
                                                             <?= $lg ?>
+                                                            <?= $ml ?>
                                                             <?= $rfid ?>
                                                         </span>
                                                     </p>

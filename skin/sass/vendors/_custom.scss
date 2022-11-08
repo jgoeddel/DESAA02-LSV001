@@ -11,6 +11,9 @@
 }
 .row { --bs-gutter-x: 0; }
 
+.mt-102 {
+  margin-top: 102px;
+}
 // Header
 header {
   height: 50px;
@@ -32,7 +35,7 @@ table.anwesenheit tr.disabled {
   min-height: 100vH;
   align-items: flex-start;
 }
-.login-index, .index, .admin, .apqp, .netzwerk, .mitarbeiter, .kalender {
+.login-index, .index, .admin, .apqp, .netzwerk, .mitarbeiter, .kalender, .servicedesk, .schulung {
   background-position: top right;
   background-repeat: no-repeat;
   background-size: cover;
@@ -80,6 +83,12 @@ table.anwesenheit tr.disabled {
 .ford {
   background-image: url("../files/images/motorband_bg.jpg");
 }
+.servicedesk {
+  background-image: url("../files/images/bg_servicedesk_02.webp");
+}
+.schulung {
+  background-image: url("../files/images/bg_uni_7.webp");
+}
 @for $i from 1 through 12 {
   .errorpage#{$i} {
     background-image: url("../files/images/404_#{$i}.webp");
@@ -89,25 +98,33 @@ table.anwesenheit tr.disabled {
     background-attachment: fixed;
   }
 }
+@for $i from 1 through 12 {
+  .errorpageSub#{$i} {
+    background-image: url("../../skin/files/images/404_#{$i}.webp");
+    background-position: top right;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+}
 .white-box {
   position: absolute;
   padding: 70px 40px 40px;
   background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.7) 50px) top left no-repeat;
   bottom: 30%;
   right: 100px;
-  width: 35%;
+  display: inline-block;
 }
 .white-box-left {
   background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.7) 50px) top left no-repeat;
   padding: 70px 40px 40px;
   margin-top: 100px;
   margin-bottom: 50px;
-  width: 55%;
+  display: inline-block;
 }
 .medium-white-box-left {
   background: linear-gradient(135deg,transparent 50px,rgba(255,255,255,.7) 50px) top left no-repeat;
-  padding: 0 10px 10px 80px;
-  width: 40%;
+  padding: 0 30px 10px 80px;
+  display: inline-block;
   margin: 120px 0 20px 0;
 }
 .small-white-box-left {
@@ -115,7 +132,7 @@ table.anwesenheit tr.disabled {
   padding: 0 10px 10px 80px;
   margin-top: 75px;
   margin-bottom: -20px;
-  width: 40%;
+  display: inline-block;
 }
 // Buttons
 .btn {
@@ -376,6 +393,45 @@ ul.pagination {
   -webkit-transform: rotate(-90deg);
 }
 .no_trans { transform: none; }
+
+.init {
+  border-radius: 1.5rem;
+  text-align: center;
+  font-weight: 300;
+  height: 3rem;
+  width: 3rem;
+  padding-top: .7rem;
+  margin-top: 1rem;
+
+  &__primary {
+    background: $primary;
+    color: $white;
+  }
+
+  &__warning {
+    background: $secondary;
+    color: $white;
+  }
+
+  &__danger {
+    background: $danger;
+    color: $white;
+  }
+
+  &__success {
+    background: $success;
+    color: $white;
+  }
+}
+.smallinit {
+  width: 100%;
+  text-align: center;
+  border-radius: 40px;
+  font-size: 12px;
+  height: 30px;
+  padding-top: 5px;
+}
+
 
 // Small devices (landscape phones, less than 768px)
 @media (max-width: 767.98px) {

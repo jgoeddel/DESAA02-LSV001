@@ -119,7 +119,7 @@ $edit = ($seiteschreiben == 1 && $row->status < 6) ? 1 : 0;
                                     <div class="border__solid--gray_25 border__radius--5 p-2 linear__top--gray mb-2">
                                         <div class="row p-0 m-0">
                                             <div class="col-1 text-center pointer"
-                                                 onclick="window.open('assets/files/<?= $fl->datei ?>');">
+                                                 onclick="window.open('<?= Functions::getBaseURL() ?>lib/Pages/ChangeManagement/MVC/View/files/<?= $fl->datei ?>');">
                                                 <div class="p-1"><?php Functions::dspFileType($fl->typ); ?></div>
                                             </div>
                                             <div class="col-11">
@@ -158,6 +158,7 @@ $edit = ($seiteschreiben == 1 && $row->status < 6) ? 1 : 0;
                         <?php Functions::alert($_SESSION['text']['i_bilder_dateien']); ?>
                         <form action="#" class="dropzone custom_dropzone text-center" id="fileUpload<?= $id ?>">
                             <input type="hidden" name="id" value="<?= $id ?>">
+                            <input type="hidden" name="art" value="Datei">
                             <i class="fas fa-cloud-upload-alt fa-3x text-primary"></i>
                         </form>
                     </div><!-- ms-3 -->

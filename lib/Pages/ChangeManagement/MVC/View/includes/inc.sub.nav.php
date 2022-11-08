@@ -6,7 +6,7 @@ use App\Pages\Home\IndexDatabase;
 
 $heute = DATE('Y-m-d');
 ?>
-<nav class="navbar navbar-expand-xxl navbar-light border__bottom--solid-gray_25 p-0 w-100 z10 bg__white px-4"
+<nav class="navbar navbar-expand-sm navbar-light border__bottom--solid-gray_25 p-0 w-100 z10 bg__white px-4"
      data-spy="affix"
      data-offset-top="192" id="sub_nav">
     <div class="container-fluid">
@@ -30,9 +30,10 @@ $heute = DATE('Y-m-d');
                     $row = ChangeManagementDatabase::getElement($id);
                     # Parameter abrufen
                     $anzLog = ChangeManagementDatabase::countCMElements($id, 'base2log');
-                    $anzFiles = ChangeManagementDatabase::countCMElements($id, 'base2files');
+                    $anzFiles = ChangeManagementDatabase::countFiles($id,2);
                     $anzLop = ChangeManagementDatabase::countCMElements($id, 'base2lop');
                     $anzMeeting = ChangeManagementDatabase::countCMElements($id, 'meeting');
+                    $anzAngebote = ChangeManagementDatabase::countFiles($id,3);
                     $anzPartNo = ChangeManagementDatabase::countPartNo($id);
                     $pne = ChangeManagementDatabase::checkPart($id,'partno');
                     if (empty($anz_meeting)) $anz_meeting = 0;
@@ -49,6 +50,12 @@ $heute = DATE('Y-m-d');
                     # Dateien
                     if ($row->status > 6 && $anzFiles === 0): else:
                         echo "<li class=\"nav-item\"><a href=\"/changeManagement/dateien?id=" . $_SESSION['wrk']['id'] . "&amp;loc=" . $_SESSION['wrk']['loc'] . "\" class=\"nav-link\">" . $_SESSION['text']['n_dateien'] . " ($anzFiles)</a></li>\n";
+                    endif;
+                    # Angebote
+                    if ($row->status > 6 && $anzAngebote === 0): else:
+                        if(ChangeManagementDatabase::checkMaAngebot($_SESSION['user']['id'], $id) || $_SESSION['rechte']['36.0'] == 1):
+                        echo "<li class=\"nav-item\"><a href=\"/changeManagement/angebote?id=" . $_SESSION['wrk']['id'] . "&amp;loc=" . $_SESSION['wrk']['loc'] . "\" class=\"nav-link\">" . $_SESSION['text']['h_angebote'] . " ($anzAngebote)</a></li>\n";
+                        endif;
                     endif;
                     # Maßnahmenplan
                     if ($row->status > 6 && $anzLop === 0): else:
@@ -73,7 +80,18 @@ $heute = DATE('Y-m-d');
                         }
                     }
                 }
+                if ($_SESSION['seite']['name'] == 'index') {
+                    ?>
+                    <li>
+                        <input type="text" class="invisible-formfield font-size-12 mx-3 h-100" placeholder="Suche" onfocus="dspHinweis(this.value)" onkeyup="suche(this.value);">
+                    </li>
+                    <li id="hinweisSuche" class="dspnone ps-3">
+                        <a class="nav-link ps-3 font-size-11 italic"><?= $_SESSION['text']['i_sucheHinweis'] ?></a>
+                    </li>
+                <?php
+                }
                 ?>
+
             </ul>
         </div><!-- navbar-coolapse -->
     </div><!-- container-fluid -->

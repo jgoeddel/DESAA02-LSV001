@@ -72,6 +72,27 @@ Functions::dspParallaxNeuerUser("RHENUS LMS GmbH &bull; $wrkabteilung", $_SESSIO
                 $danger = ($db->getAbwesend($user->id) > 0) ? '<i class="fa fa-square text-danger ms-1"></i>' : '';
                 $vletter = mb_substr($user->vorname, 0, 1);
                 $mid = Functions::encrypt($user->id);
+                # Manuelle Änderungen
+                $x = RotationsplanDatabase::getMaAuswertung($user->id);
+                $summe = 0;
+                foreach($x AS $row):
+                    $zs1e = RotationsplanDatabase::getMaTagZs($user->id,$row->datum,1,4,"c_person2station");
+                    $zs1a = RotationsplanDatabase::getMaTagZs($user->id,$row->datum,1,4,"c_person2station_archiv");
+                    $zs2e = RotationsplanDatabase::getMaTagZs($user->id,$row->datum,2,5,"c_person2station");
+                    $zs2a = RotationsplanDatabase::getMaTagZs($user->id,$row->datum,2,5,"c_person2station_archiv");
+                    $zs3e = RotationsplanDatabase::getMaTagZs($user->id,$row->datum,3,6,"c_person2station");
+                    $zs3a = RotationsplanDatabase::getMaTagZs($user->id,$row->datum,3,6,"c_person2station_archiv");
+                    # Abweichungen
+                    $a1 = ($zs1e != $zs1a) ? 1 : 0;
+                    $a2 = ($zs2e != $zs2a) ? 1 : 0;
+                    $a3 = ($zs3e != $zs3a) ? 1 : 0;
+                    # Ergebnis
+                    $e1 = $a1+$a2+$a3;
+                    $summe = $summe + $e1;
+                    # Prozent
+                    $p = number_format(100/$db->getAnzahlEinsatzGesamt($user->id)*$summe,2,',','.');
+                endforeach;
+                if(!isset($p)) $p = 0;
                 ?>
 
 
@@ -80,7 +101,9 @@ Functions::dspParallaxNeuerUser("RHENUS LMS GmbH &bull; $wrkabteilung", $_SESSIO
                     <div class="mx-2">
                         <div class="kommentar row border__bottom--dotted-gray m-0 p-0 mb-2">
                             <div class="col-12 font-size-14 pt-2 pe-2">
-                                <p class="p-0 m-0 pt-2 oswald"><?= $user->vorname ?> <?= $user->name ?></p>
+                                <p class="p-0 m-0 pt-2 oswald"><?= $user->vorname ?> <?= $user->name ?>
+                                    <span class="float-end"><?= $p ?>%</span>
+                                </p>
                                 <p class="text-warning font-size-11 p-0 m-0 mb-2">
                                     <?= $abteilung ?> &bull; Schicht <?= $user->schicht ?>
                                     <span class="float-end">

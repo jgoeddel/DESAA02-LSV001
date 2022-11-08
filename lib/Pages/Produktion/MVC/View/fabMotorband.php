@@ -80,36 +80,27 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE &bull; $wrkdatum"
                 <?php for ($i = 6; $i < 22; $i++):
                     # Sommerzeit berücksichtigen
                     $x = $i + $z;
+                    # Abrufe FAB ANlage
+                    $abrufe[$i] = ProduktionDatabase::getAbrufeFabStunde('' . $_SESSION['wrk']['datum'] . '', '' . $_SESSION['parameter']['anfangszeit'][$x] . '', '' . $_SESSION['parameter']['endzeit'][$x] . '')*3;
                     ?>
                     <td class="text-center">
-                        <?= ProduktionDatabase::getAbrufeFabStunde('' . $_SESSION['wrk']['datum'] . '', '' . $_SESSION['parameter']['anfangszeit'][$x] . '', '' . $_SESSION['parameter']['endzeit'][$x] . '') ?>
+                        <?= $abrufe[$i] ?>
                     </td>
                 <?php endfor; ?>
             </tr>
             <tr>
-                <td class="text-end"><?= $_SESSION['text']['h_fab'] ?></td>
+                <td class="text-end">&Oslash; <?= $_SESSION['text']['h_taktzeit'] ?></td>
                 <?php for ($i = 6; $i < 22; $i++):
                     # Sommerzeit berücksichtigen
                     $x = $i + $z;
+                    $zeit = ProduktionDatabase::getTaktzeit($_SESSION['parameter']['anfangszeit'][$i],$abrufe[$i]);
                     ?>
                     <td class="text-center">
-                        <?= ProduktionDatabase::getAbrufeFabStunde('' . $_SESSION['wrk']['datum'] . '', '' . $_SESSION['parameter']['anfangszeit'][$x] . '', '' . $_SESSION['parameter']['endzeit'][$x] . '')*3 ?>
+                        <?= Functions::clockalize($zeit) ?>
                     </td>
                 <?php endfor; ?>
             </tr>
-            <tr>
-                <td class="text-end"><?= $_SESSION['text']['h_taktzeit'] ?></td>
-                <?php for ($i = 6; $i < 22; $i++):
-                    # Sommerzeit berücksichtigen
-                    $x = $i + $z;
-                    $anzahl = ProduktionDatabase::getAbrufeFabStunde('' . $_SESSION['wrk']['datum'] . '', '' . $_SESSION['parameter']['anfangszeit'][$x] . '', '' . $_SESSION['parameter']['endzeit'][$x] . '');
-                    $takt[$i] = ($anzahl > 0) ? ProduktionDatabase::getTaktzeit($_SESSION['parameter']['anfangszeit'], $anzahl) : 0;
-                    ?>
-                    <td class="text-center">
-                        <?= Functions::clockalize($takt[$i]) ?>
-                    </td>
-                <?php endfor; ?>
-            </tr>
+
             </tbody>
         </table>
     </div><!-- table-responsive -->
@@ -157,16 +148,15 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE &bull; $wrkdatum"
                                 <?php endfor; ?>
                             </tr>
                             <tr>
-                                <td class="text-end"><?= $_SESSION['text']['h_taktzeit'] ?></td>
+                                <td class="text-end">&Oslash; <?= $_SESSION['text']['h_taktzeit'] ?></td>
                                 <?php for ($i = 6; $i < 14; $i++):
                                     # Sommerzeit berücksichtigen
                                     $x = $i + $z;
-                                    $anzahl = ProduktionDatabase::getAbrufeFabStunde('' . $_SESSION['wrk']['datum'] . '', '' . $_SESSION['parameter']['anfangszeit'][$x] . '', '' . $_SESSION['parameter']['endzeit'][$x] . '');
-                                    $takt[$i] = ($anzahl > 0) ? ProduktionDatabase::getTaktzeit($_SESSION['parameter']['anfangszeit'], $anzahl) : 0;
+                                    $zeit = ProduktionDatabase::getTaktzeit($_SESSION['parameter']['anfangszeit'][$i],$abrufe[$i]);
                                     ?>
-                                <td class="text-center">
-                                    <?= Functions::clockalize($takt[$i]) ?>
-                                </td>
+                                    <td class="text-center">
+                                        <?= Functions::clockalize($zeit) ?>
+                                    </td>
                                 <?php endfor; ?>
                             </tr>
                             <tr>
@@ -264,15 +254,14 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE &bull; $wrkdatum"
                                 <?php endfor; ?>
                             </tr>
                             <tr>
-                                <td class="text-end"><?= $_SESSION['text']['h_taktzeit'] ?></td>
+                                <td class="text-end">&Oslash; <?= $_SESSION['text']['h_taktzeit'] ?></td>
                                 <?php for ($i = 14; $i < 22; $i++):
                                     # Sommerzeit berücksichtigen
                                     $x = $i + $z;
-                                    $anzahl = ProduktionDatabase::getAbrufeFabStunde('' . $_SESSION['wrk']['datum'] . '', '' . $_SESSION['parameter']['anfangszeit'][$x] . '', '' . $_SESSION['parameter']['endzeit'][$x] . '');
-                                    $takt[$i] = ($anzahl > 0) ? ProduktionDatabase::getTaktzeit($_SESSION['parameter']['anfangszeit'], $anzahl) : 0;
+                                    $zeit = ProduktionDatabase::getTaktzeit($_SESSION['parameter']['anfangszeit'][$i],$abrufe[$i]);
                                     ?>
                                     <td class="text-center">
-                                        <?= Functions::clockalize($takt[$i]) ?>
+                                        <?= Functions::clockalize($zeit) ?>
                                     </td>
                                 <?php endfor; ?>
                             </tr>
@@ -431,6 +420,11 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE &bull; $wrkdatum"
 # Footer einbinden
 Functions::getFooterBase();
 Functions::getFooterJs();
+
+ProduktionDatabase::cronCallOffs($_SESSION['mkspts']['server'],
+    $_SESSION['mkspts']['database'],
+    $_SESSION['mkspts']['uid'],
+    $_SESSION['mkspts']['pwd']);
 ?>
 <script type="text/javascript" src="<?= Functions::getBaseURL() ?>skin/plugins/chart.min.js"></script>
 <script type="text/javascript" src="<?= Functions::getBaseURL() ?>/skin/plugins/other/progressbar.js"></script>

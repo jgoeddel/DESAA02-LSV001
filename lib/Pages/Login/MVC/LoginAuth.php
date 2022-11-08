@@ -97,7 +97,7 @@ class LoginAuth
                     $_SESSION['user']['wrk_schicht'] = $userdata->wrk_schicht;
                     $_SESSION['user']['dbname'] = $userdata->vorname . " " . $userdata->name;
                     $_SESSION['user']['lang'] = $userdata->lang;
-                    $_SESSION['user']['cryptID'] = \App\Functions\Functions::encrypt($userdata->id);
+                    $_SESSION['user']['citycode'] = $userdata->citycode;
                     // Rechte setzen
                     $this->administrationDatabase->setUserRights($userdata->id);
                     // Login setzen
@@ -113,7 +113,6 @@ class LoginAuth
         $user = $this->administrationDatabase->getUser("", $username);
         var_dump($user);
         if ($user) {
-            // $password_hash = password_hash('rka719', PASSWORD_DEFAULT);
             if (password_verify($password, $user->password)) {
                 $user = $this->administrationDatabase->getUser("", $username);
                 session_regenerate_id(true);

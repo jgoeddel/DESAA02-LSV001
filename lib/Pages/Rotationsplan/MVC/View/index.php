@@ -127,6 +127,8 @@ Functions::getFooterJs();
 /*
  TODO: Wenn für einen Mitarbeiter eine Abwesenheit eingetragen wird, muss er aus allen künftigen Rotationsplänen gelöscht werden.
  */
+# Update der Datenbank -> Anpassen der Einsätze in der Tabelle c_qualifikation
+# RotationsplanDatabase::updateQualifikationDB();
 ?>
 <!-- Zusätzliche Javascript Dateien -->
 <script type="text/javascript" src="<?= Functions::getBaseUrl() ?>skin/js/base.js"></script>

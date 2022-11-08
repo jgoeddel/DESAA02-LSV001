@@ -78,6 +78,12 @@ class AdministrationDatabase extends \App\App\AbstractMVC\AbstractDatabase
         $sql = "SELECT * FROM b_mitarbeiter WHERE id = ? OR username = ?";
         return self::run($sql,[$id,$username])->fetch(PDO::FETCH_OBJ);
     }
+    # Userid anhand Namen ermitteln
+    public static function getUserID($vorname,$name)
+    {
+        $sql = "SELECT id FROM b_mitarbeiter WHERE vorname = '$vorname' AND name = '$name'";
+        return self::run($sql)->fetchColumn();
+    }
     # Rechte setzen
     public function setUserRights($id)
     {
@@ -201,7 +207,7 @@ class AdministrationDatabase extends \App\App\AbstractMVC\AbstractDatabase
             if(isset($password) && $password != '') {
                 $sql .= "password = '$hash', ";
             }
-            $sql.= "status = '1', ";
+            $sql.= "status = '$status', ";
             $sql.= "lang = '$lang' ";
             $sql.= "WHERE id = '$id' LIMIT 1";
             self::run($sql, [$vorname,$name,$abteilung,$citycode,$username,$email,$wrk_schicht,$wrk_abteilung]);
@@ -287,5 +293,59 @@ class AdministrationDatabase extends \App\App\AbstractMVC\AbstractDatabase
         # Alle User ID's abrufen, die den Citycode und CM dürfen
         return self::run("SELECT mid FROM c_mitarbeiter2bereich GROUP BY mid HAVING max(bid = '$id') = 1 AND max(bid = '36') = 1")->fetchAll(PDO::FETCH_OBJ);
     }
-    
+
+    # Alle Abteilungen nach vorgegebenem Parameter
+    public static function getAllAbt($table,$key)
+    {
+        $sql = "SELECT * FROM ". $table ." WHERE ". $key ." = '1' ORDER BY abteilung";
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
+    }
+    # Eine Abteilung nach vorgegebenem Parameter
+    public static function getOneAbt($table,$id)
+    {
+        $sql = "SELECT abteilung FROM ". $table ." WHERE id = '$id'";
+        return self::run($sql)->fetchColumn();
+    }
+    # Alle Bereiche nach vorgegebenem Parameter
+    public static function getAllBereich($table)
+    {
+        $sql = "SELECT * FROM ". $table ." ORDER BY bereich";
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
+    }
+    # Einen Bereich nach vorgegebenem Parameter
+    public static function getOneBereich($table,$id)
+    {
+        $sql = "SELECT bereich FROM ". $table ." WHERE id = '$id'";
+        return self::run($sql)->fetchColumn();
+    }
+    # Status Servicedesk
+    public static function getStatusBadge($id): string
+    {
+        $status = self::run("SELECT status FROM b_status WHERE id = '$id'")->fetchColumn();
+        switch($id):
+            case 1:
+                $sts = '<div class="badge badge-warning">'.$_SESSION['text'][''.$status.''].'</div>';
+                break;
+            case 9:
+            case 2:
+                $sts = '<div class="badge badge-primary">'.$_SESSION['text'][''.$status.''].'</div>';
+                break;
+            case 3:
+                $sts = '<div class="badge badge-success">'.$_SESSION['text'][''.$status.''].'</div>';
+                break;
+            case 4:
+                $sts = '<div class="badge badge-info">'.$_SESSION['text'][''.$status.''].'</div>';
+                break;
+            case 5:
+                $sts = '<div class="badge badge-danger">'.$_SESSION['text'][''.$status.''].'</div>';
+                break;
+        endswitch;
+        return $sts;
+    }
+    # Alle Administratoren aus einem Bereich
+    public static function getAllAdmin($bereich,$mid=0): bool|array
+    {
+        $sql = "SELECT mid FROM c_mitarbeiter2part WHERE bid = '$bereich' AND pid = '0' AND mid != '$mid'";
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
+    }
 }

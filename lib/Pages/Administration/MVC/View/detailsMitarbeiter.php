@@ -148,8 +148,8 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['te
                                 </div><!-- col -->
                             </div><!-- row -->
                             <div class="row border__bottom--dotted-gray mr-0 pb-3 mb-3">
-                                <div class="col-12">
-                                    <div class="">
+                                <div class="col-10 border__right--dotted-gray">
+                                    <div class="pe-3">
                                         <label class="font-size-12 text-muted italic" for="start">
                                             <?= $_SESSION['text']['h_mail'] ?> <span class="text-warning">*</span>
                                             <span class="korrekt ms-2"></span>
@@ -159,6 +159,19 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['te
                                         <?php Functions::invisibleInput("email", "email", "", "$email", "", "required", "{$_SESSION['text']['h_mail']}"); ?>
                                     </div><!-- pe-3 -->
                                 </div><!-- col -->
+                                <div class="col-2">
+                                    <div class="ps-3">
+                                        <label class="font-size-12 text-muted italic" for="status"><?= $_SESSION['text']['h_status'] ?></label>
+                                        <select name="status" class="invisible-formfield">
+                                            <?php
+                                            $s1 = ($user->status == 1) ? 'selected' : '';
+                                            $s2 = ($user->status == 0) ? 'selected' : '';
+                                            ?>
+                                            <option value="1" <?= $s1 ?>>1</option>
+                                            <option value="0" <?= $s2 ?>>0</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div><!-- row -->
                             <div class="row border__bottom--dotted-gray mr-0 pb-3 mb-3">
                                 <div class="col-6">

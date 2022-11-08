@@ -39,12 +39,15 @@ $seiteadmin = $pb[2];
         ?>
     </div>
     <?php
-    Functions::dspParallaxMedium("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['text']['h_offeneAnforderungen']}");
+    Functions::dspParallaxMedium("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['text']['h_kundenaenderungen']}");
     ?>
     <main class="w-100 bg__white--95 flex-shrink-0" id="main">
         <div class="container-fluid p-0">
             <?php include_once "includes/inc.sub.nav.php"; ?>
         </div><!-- fluid -->
+        <div id="ergebnis">
+
+        </div>
         <div class="container-fluid px-5">
             <p class="border__bottom--dotted-gray py-3 mb-3"><?= $_SESSION['text']['t_offeneAnforderungen'] ?></p>
             <!-- Technische Änderungen -->
@@ -147,9 +150,27 @@ $seiteadmin = $pb[2];
 Functions::getFooterBase();
 Functions::getFooterJs();
 ?>
+<script type="text/javascript" src="<?= Functions::getBaseURL() ?>/lib/Pages/ChangeManagement/MVC/View/js/action.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         heightMainContainer();
+    });
+
+    document.addEventListener("DOMContentLoaded", function(){
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 320) {
+                document.getElementById('sub_nav').classList.add('fixed-top');
+                document.getElementById('sub_nav').classList.add('mt-102');
+                // add padding top to show content behind navbar
+                navbar_height = document.querySelector('#sub_nav').offsetHeight;
+                document.body.style.paddingTop = navbar_height + 'px';
+            } else {
+                document.getElementById('sub_nav').classList.remove('fixed-top');
+                document.getElementById('sub_nav').classList.remove('mt-102');
+                // remove padding top from body
+                document.body.style.paddingTop = '0';
+            }
+        });
     });
 </script>
 </body>

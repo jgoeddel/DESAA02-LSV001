@@ -52,6 +52,10 @@ $summeEinsatz = rotationsplanDatabase::countAnzahlEinsatz($id);
 # Tabelle
 $tabelle = array("","frontcorner","kuehler","motorband","akl");
 $abteilung = $tabelle[$_SESSION['user']['wrk_abteilung']];
+
+$rma = RotationsplanDatabase::getMitarbeiterDetailsStatic($id);
+RotationsplanDatabase::chipLog($rma->rfid,$rma->id,$rma->vorname,htmlspecialchars($rma->name),$zzone);
+
 ?>
 <div class="row mt-5">
     <?php

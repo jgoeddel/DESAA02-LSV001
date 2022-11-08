@@ -125,12 +125,26 @@ class IndexDatabase extends AbstractDatabase
         $sql = "SELECT *, DATE_FORMAT(datum, '%d.%m.%Y %H:%i') AS login FROM b_mitarbeiter ORDER BY name,vorname";
         return self::run($sql)->fetchAll(\PDO::FETCH_OBJ);
     }
+    # Ausgabe aller Mitarbeiter eines Standortes
+    public static function selectMaCitycode($citycode): bool|array
+    {
+        $sql = "SELECT *, DATE_FORMAT(datum, '%d.%m.%Y %H:%i') AS login FROM b_mitarbeiter WHERE citycode = '$citycode' AND status = '1' ORDER BY name,vorname";
+        return self::run($sql)->fetchAll(\PDO::FETCH_OBJ);
+    }
 
     # Details zu User abrufen
     public static function getUserInfo($id)
     {
         $sql = "SELECT * FROM b_mitarbeiter WHERE id = ?";
         return self::run($sql, [$id])->fetch(PDO::FETCH_OBJ);
+    }
+
+    # Name anhand der ID
+    public static function getNameMa($id)
+    {
+        $sql = "SELECT vorname,name FROM b_mitarbeiter WHERE id = '$id'";
+        $a = self::run($sql)->fetch(PDO::FETCH_OBJ);
+        echo $a->vorname." ".$a->name;
     }
 
     # Alle Seiten für die Administration abrufen

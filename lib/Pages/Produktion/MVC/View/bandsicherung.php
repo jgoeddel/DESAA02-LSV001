@@ -30,6 +30,7 @@ endif;
 ($seiteschreiben == 1) ? $dspedit = '' : $dspedit = 'dspnone';
 # Neuer Buchstabe
 if($row->position == 16): $position = 1; else: $position = $row->position + 1; endif;
+
 ?>
 <!doctype html>
 <html lang="de" class="h-100">
@@ -60,24 +61,41 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['te
             <div class="col-2 border__right--dotted-gray">
                 <div class="pe-3">
                     <h3 class="oswald font-weight-100 pb-3 mb-3 border__bottom--dotted-gray"><?= $_SESSION['text']['h_taeglSicherung'] ?></h3>
-                    <?php Functions::alert($_SESSION['text']['t_taeglSicherung']); ?>
-                    <div class="row mb-3">
-                        <div class="col-4 border__right--dotted-gray">
-                            <div class="p-3 text-center">
-                                <span class="badge badge-primary oswald font-size-30 font-weight-600">
-                                    <?= $_SESSION['parameter']['tapeletters'][$position] ?>
-                                </span>
-                            </div><!-- pe-3 -->
-                        </div><!-- col -->
-                        <div class="col-8">
-                            <div class="p-3">
-                                <p class="text-muted font-size-10 italic text-center p-0 m-0"><?= $_SESSION['text']['t_eintragFuer'] ?></p>
-                                <?php Functions::invisibleInput("date", "datum", "font-size-24 text-gray", "{$_SESSION['parameter']['heuteSQL']}"); ?>
-                            </div>
-                        </div><!-- col -->
-                    </div><!-- row -->
-                    <?php Functions::alert($_SESSION['text']['t_passTape']); ?>
-
+                    <?php
+                    if($row->datum == $_SESSION['parameter']['heuteSQL']):
+                        Functions::alert($_SESSION['text']['t_sicherungEingetragen']);
+                    else:
+                        Functions::alert($_SESSION['text']['t_taeglSicherung']);
+                    endif;
+                    ?>
+                    <form id="insertSicherung" method="post">
+                        <?php
+                        Functions::hiddenField("letter","{$_SESSION['parameter']['tapeletters'][$position]}");
+                        Functions::hiddenField("position","$position");
+                        ?>
+                        <div class="row mb-3">
+                            <div class="col-4 border__right--dotted-gray">
+                                <div class="p-3 text-center">
+                                    <span class="badge badge-primary oswald font-size-30 font-weight-600">
+                                        <?= $_SESSION['parameter']['tapeletters'][$position] ?>
+                                    </span>
+                                </div><!-- pe-3 -->
+                            </div><!-- col -->
+                            <div class="col-8">
+                                <div class="p-3">
+                                    <p class="text-muted font-size-10 italic text-center p-0 m-0"><?= $_SESSION['text']['t_eintragFuer'] ?></p>
+                                    <?php Functions::invisibleInput("date", "datum", "font-size-24 text-gray", "{$_SESSION['parameter']['heuteSQL']}"); ?>
+                                </div>
+                            </div><!-- col -->
+                        </div><!-- row -->
+                        <?php Functions::alert($_SESSION['text']['t_passTape']); ?>
+                        <div class="pb-3 mb-3 border__bottom--dotted-gray">
+                            <?php Functions::invisibleInput("password","password","font-size-24 text-gray text-center","","","","","","","required"); ?>
+                        </div>
+                        <div class="text-end">
+                            <input type="submit" class="btn btn-primary btn-sm" value="Tapewechsel durchgeführt">
+                        </div>
+                    </form>
                 </div><!-- pe-3 -->
             </div><!-- col -->
             <div class="col-10">
@@ -126,12 +144,13 @@ Functions::dspParallaxSmall("INTRANET &bull; RHENUS AUTOMOTIVE", "{$_SESSION['te
 Functions::getFooterBase();
 Functions::getFooterJs();
 ?>
-<script type="text/javascript" src="<?= Functions::getBaseURL() ?>skin/plugins/chart.min.js"></script>
-<script type="text/javascript" src="<?= Functions::getBaseURL() ?>/skin/plugins/other/progressbar.js"></script>
 <script type="text/javascript" src="<?= Functions::getBaseURL() ?>/skin/plugins/other/dataTables/datatables.min.js"></script>
 <script type="text/javascript" src="<?= Functions::getBaseURL() ?>/skin/plugins/other/dataTables/date-de.js"></script>
 <script type="text/javascript" src="<?= Functions::getBaseURL() ?>/skin/plugins/other/moment.js"></script>
 <script type="text/javascript" src="<?= Functions::getBaseURL() ?>/skin/plugins/other/datetime-moment.js"></script>
+<script type="text/javascript" src="<?= Functions::getBaseURL() ?>/lib/Pages/Produktion/MVC/View/js/view.js"></script>
+<script type="text/javascript" src="<?= Functions::getBaseURL() ?>/lib/Pages/Produktion/MVC/View/js/action.js"></script>
+
 <script type="text/javascript">
     $(document).ready(function () {
         heightMainContainer();

@@ -170,7 +170,7 @@ Functions::dspParallaxSmall("RHENUS LMS GmbH &bull; $wrkabteilung", $_SESSION['t
                 <?php
                 Functions::htmlOpenDiv(12, "bottom", "dotted", "", "", "pb-3", "");
                 ?>
-                <select class="no-border font-size-12 w-100" name="stationen"
+                <select class="invisible-formfield font-size-12 w-100" name="stationen"
                         onchange="showFormularQualiMa(this.value,<?= $ma->id ?>)">
                     <option value="">Bitte wählen Sie eine Station</option>
                     <?php
@@ -255,7 +255,7 @@ Functions::dspParallaxSmall("RHENUS LMS GmbH &bull; $wrkabteilung", $_SESSION['t
                     <?php
                     Functions::htmlOpenDiv(12, "bottom", "dotted", "", "", "pb-3", "");
                     ?>
-                    <select class="no-border font-size-12 w-100" name="station" required>
+                    <select class="invisible-formfield font-size-12 w-100" name="station" required>
                         <option value="">Bitte wählen Sie eine Station</option>
                         <?php
                         $stnabt = $db->getStationAbteilung();
@@ -293,15 +293,17 @@ Functions::dspParallaxSmall("RHENUS LMS GmbH &bull; $wrkabteilung", $_SESSION['t
                 </div>
                 <?php
                 $hcap = $db->getHandicapDetails($ma->id);
+
                 if ($hcap):
                     foreach ($hcap as $handicap):
                         $station = $db->getStation($handicap->sid);
+                        $handicap->stop = ($handicap->stop == '00.00.0000') ? "offen" : "am ".$handicap->stop;
                         ?>
                         <div class="border__bottom--dotted-gray_50 py-2 font-size-12 divhover ps-2">
                             <span class="badge badge-black me-2"><?= $station->id ?></span><?= $station->station ?>
                             &bull; <?= $station->bezeichnung ?><br>
                             <small class="text-warning italic font-size-10">Beginn am <?= $handicap->beginn ?>
-                                &bull; Ende am <?= $handicap->stop ?></small>
+                                &bull; Ende <?= $handicap->stop ?></small>
                         </div>
                     <?php
                     endforeach;
@@ -384,6 +386,75 @@ Functions::dspParallaxSmall("RHENUS LMS GmbH &bull; $wrkabteilung", $_SESSION['t
             Functions::htmlCloseDiv();
             ?>
             </div>
+
+            <table class="table table-sm table-bordered table-hover table-striped font-size-12">
+                <thead class="thead-dark">
+                <tr>
+                    <th rowspan="2" class="text-center">Datum</th>
+                    <th colspan="3" class="text-center">Zeitschiene 1</th>
+                    <th colspan="3" class="text-center">Zeitschiene 2</th>
+                    <th colspan="3" class="text-center">Zeitschiene 3</th>
+                    <th rowspan="2" colspan="2" class="text-center">Änderungen</th>
+                </tr>
+                <tr>
+                    <th class="text-center">Geplant</th>
+                    <th class="text-center">Eingesetzt</th>
+                    <th>&nbsp;</th>
+                    <th class="text-center">Geplant</th>
+                    <th class="text-center">Eingesetzt</th>
+                    <th>&nbsp;</th>
+                    <th class="text-center">Geplant</th>
+                    <th class="text-center">Eingesetzt</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                $x = RotationsplanDatabase::getMaAuswertung($ma->id);
+                $summe = 0;
+                foreach($x AS $row):
+                    $zs1e = RotationsplanDatabase::getMaTagZs($ma->id,$row->datum,1,4,"c_person2station");
+                    $zs1a = RotationsplanDatabase::getMaTagZs($ma->id,$row->datum,1,4,"c_person2station_archiv");
+                    $zs2e = RotationsplanDatabase::getMaTagZs($ma->id,$row->datum,2,5,"c_person2station");
+                    $zs2a = RotationsplanDatabase::getMaTagZs($ma->id,$row->datum,2,5,"c_person2station_archiv");
+                    $zs3e = RotationsplanDatabase::getMaTagZs($ma->id,$row->datum,3,6,"c_person2station");
+                    $zs3a = RotationsplanDatabase::getMaTagZs($ma->id,$row->datum,3,6,"c_person2station_archiv");
+                    # Abweichungen
+                    $a1 = ($zs1e != $zs1a) ? 1 : 0;
+                    $a2 = ($zs2e != $zs2a) ? 1 : 0;
+                    $a3 = ($zs3e != $zs3a) ? 1 : 0;
+                    # Ausgabe
+                    $dspA1 = ($a1 == 1) ? '<i class="fa fa-dot-circle text-danger"></i>' : '<i class="fa fa-dot-circle text-success"></i>';
+                    $dspA2 = ($a2 == 1) ? '<i class="fa fa-dot-circle text-danger"></i>' : '<i class="fa fa-dot-circle text-success"></i>';
+                    $dspA3 = ($a3 == 1) ? '<i class="fa fa-dot-circle text-danger"></i>' : '<i class="fa fa-dot-circle text-success"></i>';
+                    # Ergebnis
+                    $e1 = $a1+$a2+$a3;
+                    $summe = $summe + $e1;
+                    # Prozent
+                    $p = number_format(100/$db->getAnzahlEinsatzGesamt($ma->id)*$summe,2,',','.');
+                ?>
+                <tr>
+                    <td class="text-center"><?= $row->tag ?></td>
+                    <td class="text-center"><?= $zs1a ?></td>
+                    <td class="text-center"><?= $zs1e ?></td>
+                    <td class="text-center"><?= $dspA1 ?></td>
+                    <td class="text-center"><?= $zs2a ?></td>
+                    <td class="text-center"><?= $zs2e ?></td>
+                    <td class="text-center"><?= $dspA2 ?></td>
+                    <td class="text-center"><?= $zs3a ?></td>
+                    <td class="text-center"><?= $zs3e ?></td>
+                    <td class="text-center"><?= $dspA3 ?></td>
+                    <td class="text-center"><?= $e1 ?></td>
+                </tr>
+                <?php
+                endforeach;
+                ?>
+                <tr>
+                    <td colspan="10" class="text-end"><b>Änderungen Gesamt: </b></td>
+                    <td class="text-center"><b><?= $p ?>%</b></td>
+                </tr>
+                </tbody>
+            </table>
         </div><!-- p-3 -->
     </div>
 </main>

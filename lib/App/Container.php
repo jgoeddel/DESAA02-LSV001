@@ -24,10 +24,16 @@ use App\Pages\Login\MVC\LoginAuth;
 use App\Pages\Login\MVC\LoginController;
 use App\Pages\Produktion\MVC\ProduktionController;
 use App\Pages\Produktion\ProduktionDatabase;
+use App\Pages\Prodview\MVC\ProdviewController;
+use App\Pages\Prodview\ProdviewDatabase;
 use App\Pages\Rotationsplan\MVC\RotationsplanController;
 use App\Pages\Rotationsplan\RotationsplanDatabase;
 use App\Pages\Scan\MVC\ScanController;
+use App\Pages\Schulungen\MVC\SchulungenController;
+use App\Pages\Schulungen\SchulungenDatabase;
 use App\Pages\SecurityLogin\SecurityLoginDatabase;
+use App\Pages\Servicedesk\MVC\ServicedeskController;
+use App\Pages\Servicedesk\ServicedeskDatabase;
 
 class Container
 {
@@ -107,10 +113,25 @@ class Container
             # LOGBUCH
 
             # SERVICEDESK
-
+            'servicedeskController' => function () {
+                return new ServicedeskController(
+                    $this->build('servicedeskDatabase')
+                );
+            },
+            'servicedeskDatabase' => function () {
+                return new ServicedeskDatabase($this->build('rhs_servicedesk'));
+            },
             # KUNDENÄNDERUNGEN
 
             # SCHULUNGEN
+            'schulungenController' => function () {
+                return new SchulungenController(
+                  $this->build('schulungenDatabase')
+                );
+            },
+            'schulungenDatabase' => function () {
+                return new SchulungenDatabase($this->build('rhs_schulungen'));
+            },
 
             # ROTATIONSPLAN
             'rotationsplanController' => function () {
@@ -142,6 +163,13 @@ class Container
             },
             'cronDatabase' => function () {
                 return new CronDatabase($this->build('rhs_cm'));
+            },
+            # PRODUKTIONSANZEIGEN
+            'prodviewController' => function () {
+                return new ProdviewController($this->build(('prodviewDatabase')));
+            },
+            'prodviewDatabase' => function () {
+                return new ProdviewDatabase($this->build('rhs_produktion'));
             },
             # EMAIL
             'emailController' => function () {

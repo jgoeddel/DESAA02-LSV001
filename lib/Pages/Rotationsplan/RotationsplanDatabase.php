@@ -159,6 +159,7 @@ class RotationsplanDatabase extends AbstractDatabase
     # Personal einer Schicht / Abteilung abrufen
     public function getMitarbeiterSchicht($limit): bool|array
     {
+        if(!isset($_SESSION['user']['wrk_abteilung'])) $_SESSION['user']['wrk_abteilung'] = 1;
         $sql = "SELECT * FROM b_mitarbeiter WHERE abteilung = '{$_SESSION['user']['wrk_abteilung']}' ";
         $sql .= "AND schicht = '{$_SESSION['user']['wrk_schicht']}' ";
         $sql .= "AND status = '1' ";
@@ -349,6 +350,12 @@ class RotationsplanDatabase extends AbstractDatabase
 
     # Mitarbeiterdetails
     public function getMitarbeiterDetails($id)
+    {
+        $sql = "SELECT * FROM b_mitarbeiter WHERE id = ?";
+        return self::run($sql, [$id])->fetch(\PDO::FETCH_OBJ);
+    }
+    # Mitarbeiterdetails (static)
+    public static function getMitarbeiterDetailsStatic($id)
     {
         $sql = "SELECT * FROM b_mitarbeiter WHERE id = ?";
         return self::run($sql, [$id])->fetch(\PDO::FETCH_OBJ);
@@ -630,21 +637,15 @@ class RotationsplanDatabase extends AbstractDatabase
     public static function getZeitschieneSchicht(): int
     {
         // Kalenderwoche
-        $date = new DateTime('' . $_SESSION['wrk']['datum'] . '');
+        // $date = new DateTime('' . $_SESSION['wrk']['datum'] . '');
+        $date = new DateTime();
+        $stunde = $date->format('G');
         $kw = $date->format('W');
         // Gerade oder ungerade KW
         if ($kw % 2 == 0) {
-            if ($_SESSION['user']['wrk_schicht'] == 1) {
-                return 1;
-            } else {
-                return 2;
-            }
+            if($stunde <= 12) { return 2; } else { return 1; }
         } else {
-            if ($_SESSION['user']['wrk_schicht'] == 1) {
-                return 2;
-            } else {
-                return 1;
-            }
+            if($stunde <= 12) { return 1; } else { return 2; }
         }
     }
 
@@ -698,7 +699,7 @@ class RotationsplanDatabase extends AbstractDatabase
     {
         $sql = "SELECT sid FROM c_person2station WHERE datum = '{$_SESSION['parameter']['heuteSQL']}' ";
         $sql .= "AND uid = '$uid' AND zeitschiene = '$z'";
-        echo $sql;
+        #echo $sql;
         $a = self::run($sql)->fetchColumn();
         if (empty($a)) $a = 104;
         return $a;
@@ -827,6 +828,51 @@ class RotationsplanDatabase extends AbstractDatabase
     public static function showWrkParameter()
     {
         return self::getAbteilungRotationsplan($_SESSION['user']['wrk_abteilung'])." ".$_SESSION['text']['h_schicht']." ".$_SESSION['user']['wrk_schicht'];
+    }
+
+    # Abfrage für die Auswertungstabelle
+    public static function getMaAuswertung($uid)
+    {
+        $sql = "SELECT *, DATE_FORMAT(datum, '%d.%m.%Y') AS tag FROM c_person2station WHERE uid = '$uid' GROUP BY datum ORDER BY datum";
+        return self::run($sql)->fetchAll(PDO::FETCH_OBJ);
+    }
+    public static function getMaTagZs($uid,$datum,$zs,$zs2,$tabelle)
+    {
+        $sql = "SELECT sid FROM ".$tabelle." WHERE datum = '$datum' AND uid = '$uid' AND (zeitschiene = '$zs' || zeitschiene = '$zs2')";
+        $sid = self::run($sql)->fetchColumn();
+        $sql = "SELECT station FROM b_station WHERE id = '$sid'";
+        return self::run($sql)->fetchColumn();
+    }
+
+    # Anpassen der Qualifikationen (Anzahl Einsätze) in der Datenbank
+    public static function updateQualifikationDB()
+    {
+        # Mitarbeiter abrufen
+        $sql = "SELECT id FROM b_mitarbeiter";
+        $a = self::run($sql)->fetchAll(PDO::FETCH_OBJ);
+        foreach($a AS $b){
+            # Alle Stationen abrufen
+            $sql = "SELECT id FROM b_station WHERE abteilung = '1'";
+            $c = self::run($sql)->fetchAll(PDO::FETCH_OBJ);
+            foreach($c AS $d){
+                # Qualifikation vorhanden ?
+                $e = self::run("SELECT id FROM c_qualifikation WHERE sid = '$d->id' AND uid = '$b->id'");
+                if($e){
+                    # Anzahl der Einsätze an der Station abrufen
+                    $f = self::run("SELECT COUNT(id) FROM c_person2station WHERE uid = '$b->id' AND sid = '$d->id'")->fetchColumn();
+                    # Tabelle updaten
+                    self::run("UPDATE c_qualifikation SET anzahl = '$f' WHERE uid = '$b->id' AND sid = '$d->id' LIMIT 1");
+                }
+            }
+        }
+
+    }
+
+    # Chip Log
+    public static function chipLog($chip,$mid,$vorname,$name,$zzone)
+    {
+        $sql = "INSERT INTO chipLog SET chip = '$chip', datum = now(), mid = '$mid',vorname = '$vorname', name = '$name', zzone = '$zzone'";
+        self::run($sql);
     }
 
 }

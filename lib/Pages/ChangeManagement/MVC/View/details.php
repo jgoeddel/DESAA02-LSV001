@@ -4,6 +4,8 @@
 # Klassen
 use App\Functions\Functions;
 use App\Pages\ChangeManagement\ChangeManagementDatabase;
+use App\PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+
 $_SESSION['seite']['id'] = 36;
 $_SESSION['seite']['name'] = 'details';
 $subid = 0;
@@ -198,7 +200,9 @@ $_SESSION['wrk']['loc'] = $_GET['loc'];
                                     </select>
                                 <?php
                                 else:
+                                    if(ChangeManagementDatabase::getFeldValue($info->quelle, "quelle") != ''):
                                     echo $_SESSION['text']['' . ChangeManagementDatabase::getFeldValue($info->quelle, "quelle") . ''];
+                                    endif;
                                 endif;
                                 ?>
                             </div><!-- col-6 -->
@@ -311,7 +315,7 @@ $_SESSION['wrk']['loc'] = $_GET['loc'];
                                 <?php Functions::alert($_SESSION['text']['t_noEvaluation']); ?>
                             </div><!-- no-evaluation -->
                             <div id="wrk_evaluation" class="<?= $wrke ?>">
-                                <?php if (changeManagementDatabase::countOpenEvaluation($id, 1) != 0):
+                                <?php if (changeManagementDatabase::countOpenEvaluation($id, 1) > 0):
                                     Functions::alert($_SESSION['text']['t_bearbeitung_ev']);
                                 endif; ?>
                                 <div class="row m-0 mb-3">
@@ -401,7 +405,7 @@ $_SESSION['wrk']['loc'] = $_GET['loc'];
 
                             <?php
                             if ($tracking === 1):
-                                if($row->status < 3):
+                                if($row->status < 3 && $dspe != ''):
                                 Functions::alertIcon('info-circle', $_SESSION['text']['i_tracking']);
                                 endif;
                                 ?>
@@ -535,6 +539,8 @@ Functions::getFooterJs();
                 }
             }
         });
+
+
         <?php endif; ?>
     });
 </script>

@@ -15,7 +15,7 @@ class Functions
 {
 
     # Sonderzeichen ersetzen
-    public static function translateFilename($filename): string // Dateinamen anpassen
+    public static function translateFilename($filename): string
     {
         $trans = array("%20" => "_", " " => "_", "ü" => "ue",
             "Ü" => "Ue", "Ä" => "Ae", "ä" => "ae", "Ö" => "Oe",
@@ -72,6 +72,12 @@ class Functions
         $datum = new DateTime($date);
         return $datum->format('d.m.Y');
     }
+    public static function germanDateFormatTime($date): bool|string
+    {
+        $datum = new DateTime($date);
+        return $datum->format('d.m.Y, H:i');
+    }
+
     # Ausgabe deutscher Tag
     public static function germanTag($date): array|string
     {
@@ -111,7 +117,7 @@ class Functions
 
 
     # Zeigt das Bild im Parallax Bereich an
-    public static function dspParallaxImg(string $bild)
+    public static function dspParallaxImg(string $bild): void
     {
         echo "$('.parallax-window').parallax({src: '$bild'});";
     }
@@ -132,10 +138,10 @@ class Functions
     }
 
     # Anzeige Parallax
-    public static function dspParallaxMedium(string $titel, string $subLine)
+    public static function dspParallaxMedium(string $titel, string $subLine): void
     {
         echo "<div class=\"container-fluid\" id=\"parallax\">\n";
-        echo "<div class=\"p-5\">\n";
+        echo "<div class=\"px-4\">\n";
         echo "<div class=\"medium-white-box-left\">\n";
         echo "<p class=\"font-size-16 font-weight-300 oswald m-0 p-0 pt-5\">$titel</p>";
         echo "<h1 class=\"oswald hero pt-3\">\n";
@@ -147,7 +153,7 @@ class Functions
     }
 
     # Anzeige Parallax mit Login
-    public static function dspParallaxLogin(string $titel, string $subLine)
+    public static function dspParallaxLogin(string $titel, string $subLine): void
     {
         # Version für alle Ansichten, ausser mobil
         echo "<div class=\"container-fluid d-none d-sm-block\" id=\"parallax\">\n";
@@ -230,7 +236,7 @@ class Functions
     }
 
     # Anzeige Parallax mit Login
-    public static function dspParallaxNeuerUser(string $titel, string $subLine)
+    public static function dspParallaxNeuerUser(string $titel, string $subLine): void
     {
         # Version für alle Ansichten, ausser mobil
         echo "<div class=\"container-fluid d-none d-sm-block\" id=\"parallax\">\n";
@@ -272,7 +278,7 @@ class Functions
     }
 
     # Anzeige Parallax mit Login
-    public static function dspParallaxNeueStation(string $titel, string $subLine)
+    public static function dspParallaxNeueStation(string $titel, string $subLine): void
     {
         # Version für alle Ansichten, ausser mobil
         echo "<div class=\"container-fluid d-none d-sm-block\" id=\"parallax\">\n";
@@ -314,7 +320,7 @@ class Functions
     }
 
     # Anzeige Parallax
-    public static function dspParallaxSmall(string $titel, string $subLine)
+    public static function dspParallaxSmall(string $titel, string $subLine): void
     {
         echo "<div class=\"container-fluid\" id=\"parallax\">\n";
         echo "<div class=\"p-5\">\n";
@@ -329,7 +335,7 @@ class Functions
     }
 
     # Anzeige Parallax (ohne Text)
-    public static function dspParallaxImage()
+    public static function dspParallaxImage(): void
     {
         echo "<div class=\"parallax-window w-100 mt-85\">\n";
         echo "<div class=\"container-fluid\">\n";
@@ -338,7 +344,7 @@ class Functions
     }
 
     # Base Head Elements
-    public static function getHeadBase()
+    public static function getHeadBase(): void
     {
         echo "<meta charset=\"UTF-8\">\n";
         echo "<meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\">\n";
@@ -356,7 +362,7 @@ class Functions
     }
 
     # Base Header mit Logo und Hinweisen
-    public static function getHeaderBase()
+    public static function getHeaderBase(): void
     {
         echo "<header class=\"bg__rhenus--70\">\n";
         echo "<div class=\"container-fluid border__bottom--solid-gray_25 px-4\" id=\"main_header\">\n";
@@ -375,7 +381,7 @@ class Functions
     }
 
     # Base Header mit Logo und Hinweisen
-    public static function getHeaderBasePage($bild)
+    public static function getHeaderBasePage($bild): void
     {
         $bg = ($bild == 1) ? 'bg__rhenus--70' : 'bg__primary';
         echo "<header class=\"$bg\" id=\"fixTop\">\n";
@@ -397,7 +403,7 @@ class Functions
     }
 
     # Navigation anzeigen
-    public static function dspNavigation($dspedit, $seite, $id, $bild)
+    public static function dspNavigation($dspedit, $seite, $id, $bild): void
     {
         $bg = ($bild == 1) ? 'bg__rhenus--70' : 'bg__primary';
         echo "<nav class=\"navbar navbar-expand-lg $bg sticky-nav w-100 mainnav px-4\" id=\"mnav\">\n";
@@ -434,7 +440,9 @@ class Functions
         foreach (AdministrationDatabase::getAllPages(9, 0) as $page) {
             # Externer Link
             $ext = ($page->extern == 1) ? ' target="_blank"' : '';
-            echo "<a class=\"dropdown-item\" $ext href=\"$page->link\">" . $_SESSION['text']['' . $page->i18n . ''] . "</a>";
+            if (!empty($_SESSION['rechte'][$page->id]) && $_SESSION['rechte'][$page->id] == 1 || $page->adm == '0') {
+                echo "<a class=\"dropdown-item\" $ext href=\"$page->link\">" . $_SESSION['text']['' . $page->i18n . ''] . "</a>";
+            }
         }
         echo "</ul>\n\t";
         /*
@@ -449,9 +457,8 @@ class Functions
     }
 
 
-
     # Base Footer Elements
-    public static function getFooterBase()
+    public static function getFooterBase(): void
     {
         echo "<footer class=\"footer mt-auto py-2 bg__primary font-size-10 w-100 text-white z10\" id=\"footer\">\n";
         echo "<div class=\"container-fluid\">\n";
@@ -467,10 +474,10 @@ class Functions
             echo "</a>\n";
             echo "</span>\n";
         }
-        if (isset($_SESSION['user']['id'])){
+        if (isset($_SESSION['user']['id'])) {
             echo "&bull;";
             echo "<span class=\"px-2\">";
-            echo $_SESSION['user']['vorname']. " ". $_SESSION['user']['name'];
+            echo $_SESSION['user']['vorname'] . " " . $_SESSION['user']['name'];
             echo "</span>\n";
         }
         echo "</div>\n"; # col-8
@@ -487,7 +494,7 @@ class Functions
     }
 
     # Base JS Libs
-    public static function getFooterJs()
+    public static function getFooterJs(): void
     {
         echo "<script type=\"text/javascript\" src=\"" . self::getBaseUrl() . "skin/plugins/other/popper.js\"></script>\n";
         echo "<script type=\"text/javascript\" src=\"" . self::getBaseUrl() . "skin/plugins/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js\"></script>\n";
@@ -545,7 +552,7 @@ class Functions
     }
 
     # Dateityp per Font Awesome ausgeben
-    public static function dspFileType($typ)
+    public static function dspFileType($typ): void
     {
         switch ($typ):
             case 'pdf':
@@ -700,7 +707,7 @@ class Functions
                 $seiteschreiben = 0;
             endif;
         endif;
-        return $seitelesen+$seiteschreiben+$seiteadmin;
+        return $seitelesen + $seiteschreiben + $seiteadmin;
     }
 
     /**
@@ -711,6 +718,7 @@ class Functions
         // Kalenderwoche
         $date = new DateTime('' . $datum . '');
         $kw = $date->format('W');
+        if(!isset($_SESSION['user']['wrk_schicht'])) $_SESSION['user']['wrk_schicht'] = 1;
         // Gerade oder ungerade KW
         if ($kw % 2 == 0) :
             if ($_SESSION['user']['wrk_schicht'] == 1) :
@@ -733,65 +741,85 @@ class Functions
 
         $h = intval($in);
         $m = round((((($in - $h) / 100.0) * 60.0) * 100), 0);
-        if ($m == 60)
-        {
+        if ($m == 60) {
             $h++;
             $m = 0;
         }
         return sprintf("%02d:%02d", $h, $m);
     }
 
-    # HTML ----------------------------border__bottom--dotted-gray_50
-    public static function htmlOpenDiv($col, $side, $art, $align = "", $m = "", $p = "", $pi = "")
+    # Sekunden zu Zeit
+    public static function sek2Time($a)
+    {
+        $a = abs($a);
+        return sprintf("%02d:%02d:%02d", $a/60/60/24,($a/60/60)%24,($a/60)%60,$a%60);
+    }
+    # Sommerzeit
+    public static function sommerzeit($jahr,$datum)
+    {
+        date_default_timezone_set("Europe/Berlin");
+
+        $startSummertime = date_create('last Sunday of March '.$jahr.' 02:00');
+        $endSummertime = date_create('last Sunday of October '.$jahr.' 03:00');
+        $startSummertime = $startSummertime->format('Y-m-d');
+        $endSummertime = $endSummertime->format('Y-m-d');
+        return ($startSummertime < $datum && $endSummertime > $datum) ? 1 : 0;
+    }
+
+    # HTML ----------------------------
+    public static function htmlOpenDiv($col, $side, $art, $align = "", $m = "", $p = "", $pi = ""): void
     {
         echo "<div class='col-$col border__$side--$art-gray $m $p $align'>";
         echo "<div class='$pi'>";
     }
-    public static function htmlOpenDivNoBorder($col, $align = "", $m = "", $p = "", $pi = "")
+
+    public static function htmlOpenDivNoBorder($col, $align = "", $m = "", $p = "", $pi = ""): void
     {
         echo "<div class='col-$col $m $p $align'>";
         echo "<div class='$pi'>";
     }
 
-    public static function htmlOpenSingleDiv($class, $m = "", $p = "", $align = "")
+    public static function htmlOpenSingleDiv($class, $m = "", $p = "", $align = ""): void
     {
         echo "<div class=\"$class $m $p $align\">";
     }
 
-    public static function htmlOpenSingleDivID($id, $class, $m = "", $p = "", $align = "")
+    public static function htmlOpenSingleDivID($id, $class, $m = "", $p = "", $align = ""): void
     {
         echo "<div id=\"$id\" class=\"$class $m $p $align\">";
     }
 
-    public static function htmlOpenBorderDiv($class, $side = "", $art = "dotted", $color = "gray", $opacity = "", $pi = "", $m = "", $p = "", $align = "")
+    public static function htmlOpenBorderDiv($class, $side = "", $art = "dotted", $color = "gray", $opacity = "", $pi = "", $m = "", $p = "", $align = ""): void
     {
         echo "<div class=\"$class border__$side--$art-{$color}_{$opacity} $m $p $align\">";
         echo "<div class=\"$pi\">";
     }
 
-    public static function htmlOpenBorderDiv2($class, $side = "", $art = "dotted", $color = "gray", $opacity = "", $pi = "", $m = "", $p = "", $align = "")
+    public static function htmlOpenBorderDiv2($class, $side = "", $art = "dotted", $color = "gray", $opacity = "", $pi = "", $m = "", $p = "", $align = ""): void
     {
         echo "<div class=\"$class border__$side--$art-{$color} $m $p $align\">";
     }
 
-    public static function htmlOpenDivAction($class, $action, $id="")
+    public static function htmlOpenDivAction($class, $action, $id = ""): void
     {
         echo "<div id=\"$id\" class=\"$class\" $action>";
     }
 
-    public static function alert($text)
+    public static function alert($text): void
     {
         echo "<div class='alert alert-muted font-size-11'>";
         echo $text;
         echo "</div>";
     }
-    public static function alertVar($text,$var)
+
+    public static function alertVar($text, $var): void
     {
         echo "<div class='alert alert-muted font-size-11'>";
-        echo sprintf($text,$var);
+        echo sprintf($text, $var);
         echo "</div>";
     }
-    public static function alertIcon($icon,$text)
+
+    public static function alertIcon($icon, $text): void
     {
         echo "<div class='alert alert-muted font-size-11'>";
         echo "<div class='row'>";
@@ -805,18 +833,18 @@ class Functions
         echo "</div>";
     }
 
-    public static function htmlCloseDiv()
+    public static function htmlCloseDiv(): void
     {
         echo "</div>\n";
         echo "</div>\n";
     }
 
-    public static function htmlCloseSingleDiv()
+    public static function htmlCloseSingleDiv(): void
     {
         echo "</div>\n";
     }
 
-    public static function modalHinweis()
+    public static function modalHinweis(): void
     {
         echo "
         <div class='modal fade' id='modalHinweis' data-bs-backdrop='static' data-bs-keyboard='false' tabindex='-1'
@@ -848,7 +876,7 @@ class Functions
         };
     }
 
-    public static function warten()
+    public static function warten(): void
     {
         echo "
         <div class='p-4 text-center border__dotted--gray_50 border__radius--10 bg-light-lines'>
@@ -858,7 +886,7 @@ class Functions
         ";
     }
 
-    public static function pre($var)
+    public static function pre($var): void
     {
         echo "<pre>";
         print_r($var);
@@ -866,7 +894,7 @@ class Functions
     }
 
     # Kalender (Monat zusammenstellen)
-    public static function buildMonth($start,$tage): DatePeriod
+    public static function buildMonth($start, $tage): DatePeriod
     {
         setlocale(LC_TIME, 'deu_deu');
         # Startdatum letzter Vormonat
@@ -880,18 +908,87 @@ class Functions
 
     # FORMULARE
     # input
-    public static function invisibleInput($type, $id, $class = '', $value = '', $action = '', $status = '', $placeholder = '', $max = '', $min = '')
+    public static function invisibleInput($type, $id, $class = '', $value = '', $action = '', $status = '', $placeholder = '', $max = '', $min = '', $required = ''): void
     {
-        echo "<input type='$type' name='$id' id = '$id' class='invisible-formfield $class' value='$value' $action $status placeholder='$placeholder' max='$max' min='$min'>";
+        echo "<input type='$type' name='$id' id = '$id' class='invisible-formfield $class' value='$value' $action $status placeholder='$placeholder' max='$max' min='$min' $required>";
     }
 
-    public static function invisibleDataList($name, $id, $class = '', $value = '')
+    public static function invisibleDataList($name, $id, $class = '', $value = ''): void
     {
         echo "<input list='$name' id='$id' name='$id' class='invisible-formfield $class' value='$value'>";
     }
 
-    public static function hiddenField($id,$value)
+    public static function hiddenField($id, $value): void
     {
         echo "<input type='hidden' name='$id' value='$value'>";
+    }
+
+
+    # Service Desk
+    # Status Feld
+    public static function dspStatusFeld($datum, $text, $icon, $user)
+    {
+        echo "
+        <div class=\"row border__bottom--dotted-gray mb-3 pb-3\">
+        <div class=\"col-2 border__right--dotted-gray\">
+        <div class=\"p-1 text-center\">
+        <i class=\"fa fa-$icon-circle text-muted fa-2x\"></i>
+        </div><!-- p-3 -->
+        </div><!-- col -->
+        <div class=\"col-10\">
+        <div class=\"ps-3\">
+        <p class=\"p-0 m-0\">$text</p>
+        <p class=\"p-0 m-0 font-size-11 italic text-gray\">$user &bull; $datum</p>
+        </div><!-- ps-3 -->
+        </div><!-- col -->
+        </div><!-- row -->
+        ";
+    }
+    # Datei Feld
+    public static function dspDateiFeld($datum, $text, $icon, $user, $id)
+    {
+        # Datei von angemeldetem User ?
+        $dlt = ($_SESSION['user']['dbname'] == $user) ? '<i class="fa fa-trash text-muted pointer" onclick="deleteFile(\''.$id.'\',\''.$text.'\',\''.$_SESSION['text']['i_deleteFile'].'\')"></i>' : '';
+        echo "
+        <div class=\"row border__bottom--dotted-gray mb-3 pb-3\">
+        <div class=\"col-2 border__right--dotted-gray pointer\" onclick='window.open(\"" . Functions::getBaseURL() . "/lib/Pages/Servicedesk/MVC/View/files/$text\")';>
+        <div class=\"p-1 text-center\">
+        <i class=\"fa $icon text-muted fa-2x\"></i>
+        </div><!-- p-3 -->
+        </div><!-- col -->
+        <div class=\"col-10\">
+        <div class=\"ps-3\">
+        <p class=\"p-0 m-0\">$text</p>
+        <p class=\"p-0 m-0 font-size-11 italic text-gray\">$user &bull; $datum <span class='float-end'>$dlt</span></p>
+        </div><!-- ps-3 -->
+        </div><!-- col -->
+        </div><!-- row -->
+        ";
+    }
+    # Status Button
+    public static function dspStatusButton($text, $icon, $action, $color = 'primary')
+    {
+        echo "
+        <div class=\"row border__bottom--dotted-gray mb-3 pb-3 pointer\" onclick=\"$action\">
+        <div class=\"col-2 border__right--dotted-gray\">
+        <div class=\"p-1 text-center\">
+        <i class=\"fa fa-$icon-circle text-$color fa-2x\"></i>
+        </div><!-- p-3 -->
+        </div><!-- col -->
+        <div class=\"col-10\">
+        <div class=\"ps-3\">
+        <p class=\"p-0 m-0 pt-2\">$text</p>
+        </div><!-- ps-3 -->
+        </div><!-- col -->
+        </div><!-- row -->
+        ";
+    }
+
+    # Arry nach Attribut sortieren
+    public static function build_sorter($key)
+    {
+        return function ($a, $b) use ($key) {
+            return strnatcmp($a[$key], $b[$key]);
+        };
     }
 }

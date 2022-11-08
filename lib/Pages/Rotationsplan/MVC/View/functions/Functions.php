@@ -490,7 +490,7 @@ class Functions
     {
         $sql = "SELECT *, DATE_FORMAT(start, '%d.%m.%Y') AS beginn, DATE_FORMAT(ende, '%d.%m.%Y') AS stop";
         $sql.= " FROM c_handicap WHERE uid = :mid AND ";
-        $sql .= "status != '9' AND ende > now()";
+        $sql .= "status != '9'";
         $stmt = $this->db()->prepare($sql);
         $stmt->execute([':mid' => $mid]);
         if($stmt->rowCount() > 0){
@@ -969,6 +969,8 @@ class Functions
                     $f .= "mitarbeiter = '$c->mitarbeiter', user = '{$_SESSION['user']['dbname']}', eintrag = now(), ";
                     $f .= "abteilung = '{$_SESSION['user']['wrk_abteilung']}', schicht = '{$_SESSION['user']['wrk_schicht']}', training = '$training'";
                     $this->db()->prepare($f)->execute();
+                    # Qualifikationszähler um einen erhöhen
+                    $this->db()->prepare("UPDATE c_qualifikation SET anzahl = anzahl + 1 WHERE uid = '$c->uid' AND sid = '$c->sid' LIMIT 1")->execute();
                     # Datensatz aus temporärer Tabelle löschen
                     $this->db()->prepare("DELETE FROM tmp_rotationsplan WHERE id = '$c->id' LIMIT 1")->execute();
                 } # $d = 0
